@@ -7,10 +7,11 @@ WORKDIR /workdir
 # Install
 RUN pip install numpy
 RUN pip install nibabel
+RUN pip install timm
 
 COPY source source
 
 WORKDIR /workdir/source
 
-CMD ["python", "Code/Test_C2FViT_template_matching.py"]
+CMD ["python", "Code"]
 
