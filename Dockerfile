@@ -14,5 +14,5 @@ COPY source source
 
 WORKDIR /workdir/source
 
-CMD ["python", "Code"]
+CMD ["python", "Code/Test_C2FViT_template_matching"]
 
