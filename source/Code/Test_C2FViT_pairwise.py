@@ -38,7 +38,8 @@ if __name__ == '__main__':
     if not os.path.isdir(savepath):
         os.mkdir(savepath)
 
-    use_cuda = True
+    use_cuda = False
+    # use_cuda = True
     device = torch.device("cuda" if use_cuda else "cpu")
 
     model = C2F_ViT_stage(img_size=128, patch_size=[3, 7, 15], stride=[2, 4, 8], num_classes=12,
