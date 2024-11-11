@@ -11,6 +11,8 @@ from timm.models.vision_transformer import _cfg
 
 import math
 
+from UseCuda import device
+
 
 class Mlp(nn.Module):
     def __init__(self, in_features, hidden_features=None, out_features=None, act_layer=nn.GELU, drop=0.):
@@ -535,7 +537,7 @@ class AffineCOMTransform(nn.Module):
         self.shearing_m = None
         self.scaling_m = None
 
-        self.id = torch.zeros((1, 3, 4)).cuda()
+        self.id = torch.zeros((1, 3, 4)).to(device)
         self.id[0, 0, 0] = 1
         self.id[0, 1, 1] = 1
         self.id[0, 2, 2] = 1
@@ -546,8 +548,8 @@ class AffineCOMTransform(nn.Module):
         # Matrix that register x to its center of mass
         id_grid = F.affine_grid(self.id, x.shape, align_corners=True)
 
-        to_center_matrix = torch.eye(4).cuda()
-        reversed_to_center_matrix = torch.eye(4).cuda()
+        to_center_matrix = torch.eye(4).to(device)
+        reversed_to_center_matrix = torch.eye(4).to(device)
         if self.use_com:
             x_sum = torch.sum(x)
             center_mass_x = torch.sum(x.permute(0, 2, 3, 4, 1)[..., 0] * id_grid[..., 0]) / x_sum
@@ -561,13 +563,13 @@ class AffineCOMTransform(nn.Module):
             reversed_to_center_matrix[1, 3] = -center_mass_y
             reversed_to_center_matrix[2, 3] = -center_mass_z
 
-        self.translation_m = torch.eye(4).cuda()
-        self.rotation_x = torch.eye(4).cuda()
-        self.rotation_y = torch.eye(4).cuda()
-        self.rotation_z = torch.eye(4).cuda()
-        self.rotation_m = torch.eye(4).cuda()
-        self.shearing_m = torch.eye(4).cuda()
-        self.scaling_m = torch.eye(4).cuda()
+        self.translation_m = torch.eye(4).to(device)
+        self.rotation_x = torch.eye(4).to(device)
+        self.rotation_y = torch.eye(4).to(device)
+        self.rotation_z = torch.eye(4).to(device)
+        self.rotation_m = torch.eye(4).to(device)
+        self.shearing_m = torch.eye(4).to(device)
+        self.scaling_m = torch.eye(4).to(device)
 
         trans_xyz = affine_para[0, 0:3]
         rotate_xyz = affine_para[0, 3:6] * math.pi
@@ -617,7 +619,7 @@ class DirectAffineTransform(nn.Module):
     def __init__(self):
         super(DirectAffineTransform, self).__init__()
 
-        self.id = torch.zeros((1, 3, 4)).cuda()
+        self.id = torch.zeros((1, 3, 4)).to(device)
         self.id[0, 0, 0] = 1
         self.id[0, 1, 1] = 1
         self.id[0, 2, 2] = 1
@@ -634,12 +636,12 @@ class DirectAffineTransform(nn.Module):
 class Center_of_mass_initial_pairwise(nn.Module):
     def __init__(self):
         super(Center_of_mass_initial_pairwise, self).__init__()
-        self.id = torch.zeros((1, 3, 4)).cuda()
+        self.id = torch.zeros((1, 3, 4)).to(device)
         self.id[0, 0, 0] = 1
         self.id[0, 1, 1] = 1
         self.id[0, 2, 2] = 1
 
-        self.to_center_matrix = torch.zeros((1, 3, 4)).cuda()
+        self.to_center_matrix = torch.zeros((1, 3, 4)).to(device)
         self.to_center_matrix[0, 0, 0] = 1
         self.to_center_matrix[0, 1, 1] = 1
         self.to_center_matrix[0, 2, 2] = 1

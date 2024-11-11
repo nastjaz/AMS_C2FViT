@@ -10,6 +10,7 @@ import torch.nn.functional as F
 from C2FViT_model import C2F_ViT_stage, AffineCOMTransform, Center_of_mass_initial_pairwise
 from Functions import save_img, load_4D, min_max_norm
 
+from UseCuda import device
 
 if __name__ == '__main__':
     parser = ArgumentParser()
@@ -38,9 +39,10 @@ if __name__ == '__main__':
     if not os.path.isdir(savepath):
         os.mkdir(savepath)
 
-    use_cuda = False
-    # use_cuda = True
-    device = torch.device("cuda" if use_cuda else "cpu")
+    # use_cuda = False
+    # # use_cuda = True
+    # device = torch.device("cuda" if use_cuda else "cpu")
+
 
     model = C2F_ViT_stage(img_size=128, patch_size=[3, 7, 15], stride=[2, 4, 8], num_classes=12,
                           embed_dims=[256, 256, 256],
@@ -52,7 +54,7 @@ if __name__ == '__main__':
     model.load_state_dict(torch.load(opt.modelpath))
     model.eval()
 
-    affine_transform = AffineCOMTransform().cuda()
+    affine_transform = AffineCOMTransform().to(device)
     init_center = Center_of_mass_initial_pairwise()
 
     fixed_base = os.path.basename(fixed_path)

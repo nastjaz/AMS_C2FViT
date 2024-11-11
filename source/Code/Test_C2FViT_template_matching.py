@@ -10,6 +10,8 @@ import torch.nn.functional as F
 from C2FViT_model import C2F_ViT_stage, AffineCOMTransform, Center_of_mass_initial_pairwise
 from Functions import save_img, load_4D, min_max_norm
 
+from UseCuda import device
+
 
 if __name__ == '__main__':
     parser = ArgumentParser()
@@ -51,7 +53,7 @@ if __name__ == '__main__':
     model.load_state_dict(torch.load(opt.modelpath))
     model.eval()
 
-    affine_transform = AffineCOMTransform().cuda()
+    affine_transform = AffineCOMTransform().to(device)
     init_center = Center_of_mass_initial_pairwise()
 
     fixed_base = os.path.basename(fixed_path)

@@ -8,6 +8,7 @@ import torch.utils.data as Data
 import csv
 import torch.nn.functional as F
 
+from UseCuda import device
 
 def load_4D(name):
     # X = sitk.GetArrayFromImage(sitk.ReadImage(name, sitk.sitkFloat32 ))

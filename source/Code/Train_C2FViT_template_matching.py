@@ -9,6 +9,7 @@ import torch.nn.functional as F
 import torch.utils.data as Data
 from C2FViT_model import C2F_ViT_stage, AffineCOMTransform, Center_of_mass_initial_pairwise, multi_resolution_NCC
 from Functions import Dataset_epoch_MNI152
+from UseCuda import device
 
 
 def dice(im1, atlas):
@@ -31,21 +32,21 @@ def train():
                           embed_dims=[256, 256, 256],
                           num_heads=[2, 2, 2], mlp_ratios=[2, 2, 2], qkv_bias=False, qk_scale=None, drop_rate=0.,
                           attn_drop_rate=0., norm_layer=nn.Identity,
-                          depths=[4, 4, 4], sr_ratios=[1, 1, 1], num_stages=3, linear=False).cuda()
+                          depths=[4, 4, 4], sr_ratios=[1, 1, 1], num_stages=3, linear=False).to(device)
 
     # model = C2F_ViT_stage(img_size=128, patch_size=[7, 15], stride=[4, 8], num_classes=12, embed_dims=[256, 256],
     #                       num_heads=[2, 2], mlp_ratios=[2, 2], qkv_bias=False, qk_scale=None, drop_rate=0.,
     #                       attn_drop_rate=0., norm_layer=nn.Identity, depths=[4, 4], sr_ratios=[1, 1], num_stages=2,
-    #                       linear=False).cuda()
+    #                       linear=False).to(device)
 
     # model = C2F_ViT_stage(img_size=128, patch_size=[15], stride=[8], num_classes=12, embed_dims=[256],
     #                       num_heads=[2], mlp_ratios=[2], qkv_bias=False, qk_scale=None, drop_rate=0.,
     #                       attn_drop_rate=0., norm_layer=nn.Identity, depths=[4], sr_ratios=[1], num_stages=1,
-    #                       linear=False).cuda()
+    #                       linear=False).to(device)
 
     # print(sum(p.numel() for p in model.parameters() if p.requires_grad))
 
-    affine_transform = AffineCOMTransform().cuda()
+    affine_transform = AffineCOMTransform().to(device)
     init_center = Center_of_mass_initial_pairwise()
 
     loss_similarity = multi_resolution_NCC(win=7, scale=3)
@@ -81,8 +82,8 @@ def train():
     while step <= iteration:
         for X, Y in training_generator:
 
-            X = X.cuda().float()
-            Y = Y.cuda().float()
+            X = X.to(device).float()
+            Y = Y.to(device).float()
 
             # COM initialization
             if com_initial:
