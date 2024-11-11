@@ -16,7 +16,7 @@ if __name__ == '__main__':
     parser = ArgumentParser()
     parser.add_argument("--modelpath", type=str,
                         dest="modelpath",
-                        default='/Model/C2FViT_affine_COM_pairwise_stagelvl3_118000.pth',
+                        default='../Model/C2FViT_affine_COM_pairwise_stagelvl3_118000.pth',
                         help="Pre-trained Model path")
     parser.add_argument("--savepath", type=str,
                         dest="savepath", default='../Result',
