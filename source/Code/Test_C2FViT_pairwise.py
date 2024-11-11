@@ -16,7 +16,7 @@ if __name__ == '__main__':
     parser = ArgumentParser()
     parser.add_argument("--modelpath", type=str,
                         dest="modelpath",
-                        default='../Model/C2FViT_affine_COM_pairwise_stagelvl3_118000.pth',
+                        default='/Model/C2FViT_affine_COM_pairwise_stagelvl3_118000.pth',
                         help="Pre-trained Model path")
     parser.add_argument("--savepath", type=str,
                         dest="savepath", default='../Result',
@@ -51,7 +51,8 @@ if __name__ == '__main__':
                           depths=[4, 4, 4], sr_ratios=[1, 1, 1], num_stages=3, linear=False).to(device)
 
     print(f"Loading model weight {opt.modelpath} ...")
-    model.load_state_dict(torch.load(opt.modelpath))
+    model.load_state_dict(torch.load(opt.modelpath, map_location=device))
+    #model.load_state_dict(torch.load(opt.modelpath))
     model.eval()
 
     affine_transform = AffineCOMTransform().to(device)
