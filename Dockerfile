@@ -1,7 +1,6 @@
-# Uporabimo uradno Python sliko
+# Uporabimo uradno Pytorch sliko
 FROM pytorch/pytorch:1.7.1-cuda11.0-cudnn8-runtime
 #FROM pytorch/pytorch:1.7.1-cuda11.0-cudnn8-devel
-#FROM pytorch/pytorch:1.7.1-cpu
 
 # Working directory
 WORKDIR /workdir
@@ -15,5 +14,4 @@ COPY source source
 
 WORKDIR /workdir/source
 
-ENTRYPOINT ["python", "Code/Test_C2FViT_pairwise.py"]
-CMD ["--modelpath", "Model/C2FViT_affine_COM_pairwise_stagelvl3_118000.pth",  "--fixed", "Data/image_B.nii.gz", "--moving", "Data/image_A.nii.gz"]
+CMD ["python", "Code/Test_C2FViT_pairwise.py"]
