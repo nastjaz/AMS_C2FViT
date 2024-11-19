@@ -14,4 +14,5 @@ COPY source source
 
 WORKDIR /workdir/source
 
-CMD ["python", "Code/Test_C2FViT_pairwise.py"]
+ENTRYPOINT ["python", "Code/Test_C2FViT_pairwise.py"]
+CMD ["--modelpath", "Model/C2FViT_affine_COM_pairwise_stagelvl3_118000.pth",  "--fixed", "Data/image_B.nii.gz", "--moving", "Data/image_A.nii.gz"]

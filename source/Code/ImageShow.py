@@ -7,7 +7,7 @@ import os
 # Pot do tvojih .nii.gz datotek
 fixed_path = r'C:\Users\Uporabnik\OneDrive - Univerza v Ljubljani\Documents\3. semester\Analiza medicinskih slik\Izziv\AMS_C2FViT\source\Data\image_B.nii.gz'
 moving_path = r'C:\Users\Uporabnik\OneDrive - Univerza v Ljubljani\Documents\3. semester\Analiza medicinskih slik\Izziv\AMS_C2FViT\source\Data\image_A.nii.gz'
-warped_path = r'C:\Users\Uporabnik\OneDrive - Univerza v Ljubljani\Documents\3. semester\Analiza medicinskih slik\Izziv\AMS_C2FViT\Result\warped_image_A.nii.gz'
+warped_path = r'C:\Users\Uporabnik\OneDrive - Univerza v Ljubljani\Documents\3. semester\Analiza medicinskih slik\Izziv\Result\warped_image_A.nii.gz'
 
 # Preveri, ali poti obstajajo
 if not os.path.exists(fixed_path):
