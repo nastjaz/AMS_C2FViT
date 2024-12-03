@@ -9,6 +9,8 @@ WORKDIR /workdir
 RUN pip install numpy
 RUN pip install nibabel
 RUN pip install timm==0.5.4
+RUN pip nibabel
+RUN pip scipy.ndimage
 
 COPY source source
 
