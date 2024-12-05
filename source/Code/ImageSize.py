@@ -1,6 +1,4 @@
 import nibabel as nib
-import scipy
-import matplotlib.pyplot as plt
 
 # Naloži datoteko
 image = nib.load("../ThoraxCBCT/train/ThoraxCBCT_0000_0002.nii.gz")
@@ -10,6 +8,12 @@ data = image.get_fdata()
 
 # Preveri dimenzije
 print("Dimenzije slike:", data.shape)
+
+# Spreminjanje velikosti slike na 128x128x128
+resized_data = scipy.ndimage.zoom(data, (256/data.shape[0], 256/data.shape[1], 256/data.shape[2]), order=1)
+
+# Preveri nove dimenzije
+print("Nove dimenzije slike:", resized_data.shape)
 
 # Spreminjanje velikosti slike na 256x256x256
 resized_data = scipy.ndimage.zoom(data, (256/data.shape[0], 256/data.shape[1], 256/data.shape[2]), order=1)

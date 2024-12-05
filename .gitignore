@@ -1,0 +1,9 @@
+# Ignoriraj vse .log datoteke
+*.log
+
+# Ignoriraj vse datoteke z razširitvijo .tmp
+*.tmp
+
+# Ignoriraj vse datoteke, ki jih ustvarijo IDE-ji
+.vscode/
+.idea/s
