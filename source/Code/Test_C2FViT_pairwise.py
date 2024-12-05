@@ -88,6 +88,6 @@ if __name__ == '__main__':
         X_Y, affine_matrix = affine_transform(moving_img, affine_para_list[-1])
 
         X_Y_cpu = X_Y.data.cpu().numpy()[0, 0, :, :, :]
-        save_img(X_Y_cpu, f"{savepath}/warped_{moving_base}", header=header, affine=affine)
+        save_img(X_Y_cpu, f"{savepath}/warped_{moving_base.split('.')[0]}_tryingresize.nii.gz", header=header, affine=affine)
 
     print("Result saved to :", savepath)
