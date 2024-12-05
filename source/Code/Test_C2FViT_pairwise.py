@@ -6,6 +6,7 @@ import numpy as np
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+import scipy.ndimage
 
 from C2FViT_model import C2F_ViT_stage, AffineCOMTransform, Center_of_mass_initial_pairwise
 from Functions import save_img, load_4D, min_max_norm
@@ -64,6 +65,12 @@ if __name__ == '__main__':
     fixed_img_nii = nib.load(fixed_path)
     header, affine = fixed_img_nii.header, fixed_img_nii.affine
     fixed_img = fixed_img_nii.get_fdata()
+
+    fixed_img = scipy.ndimage.zoom(fixed_img, 
+                               (256/fixed_img.shape[0], 
+                                256/fixed_img.shape[1], 
+                                256/fixed_img.shape[2]), 
+                               order=1)
     fixed_img = np.reshape(fixed_img, (1,) + fixed_img.shape)
 
     # If fixed img is MNI152 altas, do windowing
@@ -71,6 +78,12 @@ if __name__ == '__main__':
         fixed_img = np.clip(fixed_img, a_min=2500, a_max=np.max(fixed_img))
 
     moving_img = load_4D(moving_path)
+
+    moving_img = scipy.ndimage.zoom(moving_img, 
+                                (256/moving_img.shape[0], 
+                                 256/moving_img.shape[1], 
+                                 256/moving_img.shape[2]), 
+                                order=1)
 
     fixed_img = min_max_norm(fixed_img)
     moving_img = min_max_norm(moving_img)
@@ -88,6 +101,15 @@ if __name__ == '__main__':
         X_Y, affine_matrix = affine_transform(moving_img, affine_para_list[-1])
 
         X_Y_cpu = X_Y.data.cpu().numpy()[0, 0, :, :, :]
-        save_img(X_Y_cpu, f"{savepath}/warped_{moving_base}", header=header, affine=affine)
+
+        original_shape = (390, 280, 300)
+        resized_img = scipy.ndimage.zoom(X_Y_cpu, 
+                                  (original_shape[0] / X_Y_cpu.shape[0], 
+                                   original_shape[1] / X_Y_cpu.shape[1], 
+                                   original_shape[2] / X_Y_cpu.shape[2]), 
+                                  order=1)
+        
+        # save_img(X_Y_cpu, f"{savepath}/warped_{moving_base}", header=header, affine=affine)
+        save_img(resized_img, f"{savepath}/warped_{moving_base}", header=header, affine=affine)
 
     print("Result saved to :", savepath)
