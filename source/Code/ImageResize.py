@@ -44,7 +44,7 @@ data_array = sitk.GetArrayFromImage(data)
 resized_data_array = sitk.GetArrayFromImage(resized_data)
 
 # Izberi srednjo rezino (npr. srednja rezina v osi Y)
-slice_index = 100
+slice_index = data_array.shape[1] // 2
 
 # Izreži koronalno rezino
 original_slice = data_array[:, slice_index, :]  # Dimenzije: (z, x)
