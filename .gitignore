@@ -10,3 +10,4 @@
 
 # Ignoriraj slike
 *.nii.gz
+*.csv

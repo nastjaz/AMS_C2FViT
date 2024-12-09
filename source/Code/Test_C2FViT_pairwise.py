@@ -65,12 +65,6 @@ if __name__ == '__main__':
     fixed_img_nii = nib.load(fixed_path)
     header, affine = fixed_img_nii.header, fixed_img_nii.affine
     fixed_img = fixed_img_nii.get_fdata()
-
-    fixed_img = scipy.ndimage.zoom(fixed_img, 
-                               (256/fixed_img.shape[0], 
-                                256/fixed_img.shape[1], 
-                                256/fixed_img.shape[2]), 
-                               order=1)
     fixed_img = np.reshape(fixed_img, (1,) + fixed_img.shape)
 
     # If fixed img is MNI152 altas, do windowing
@@ -78,12 +72,6 @@ if __name__ == '__main__':
         fixed_img = np.clip(fixed_img, a_min=2500, a_max=np.max(fixed_img))
 
     moving_img = load_4D(moving_path)
-
-    moving_img = scipy.ndimage.zoom(moving_img, 
-                                (256/moving_img.shape[0], 
-                                 256/moving_img.shape[1], 
-                                 256/moving_img.shape[2]), 
-                                order=1)
 
     fixed_img = min_max_norm(fixed_img)
     moving_img = min_max_norm(moving_img)
