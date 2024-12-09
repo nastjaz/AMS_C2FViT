@@ -7,3 +7,6 @@
 # Ignoriraj vse datoteke, ki jih ustvarijo IDE-ji
 .vscode/
 .idea/s
+
+# Ignoriraj slike
+*.nii.gz
