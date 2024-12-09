@@ -101,15 +101,6 @@ if __name__ == '__main__':
         X_Y, affine_matrix = affine_transform(moving_img, affine_para_list[-1])
 
         X_Y_cpu = X_Y.data.cpu().numpy()[0, 0, :, :, :]
-
-        original_shape = (390, 280, 300)
-        resized_img = scipy.ndimage.zoom(X_Y_cpu, 
-                                  (original_shape[0] / X_Y_cpu.shape[0], 
-                                   original_shape[1] / X_Y_cpu.shape[1], 
-                                   original_shape[2] / X_Y_cpu.shape[2]), 
-                                  order=1)
-        
-        # save_img(X_Y_cpu, f"{savepath}/warped_{moving_base}", header=header, affine=affine)
-        save_img(resized_img, f"{savepath}/warped_{moving_base}", header=header, affine=affine)
+        save_img(X_Y_cpu, f"{savepath}/warped_{moving_base}", header=header, affine=affine)
 
     print("Result saved to :", savepath)
