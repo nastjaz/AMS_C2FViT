@@ -7,9 +7,12 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import torch.utils.data as Data
+
+# Dodaj pot za iskanje modulov v mapo Code
+sys.path.append(os.path.join(os.path.dirname(__file__), "Code"))
+
 from C2FViT_model import C2F_ViT_stage, AffineCOMTransform, Center_of_mass_initial_pairwise, multi_resolution_NCC
 from Functions import Dataset_epoch
-
 from UseCuda import device
 
 
