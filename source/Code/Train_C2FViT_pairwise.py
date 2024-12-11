@@ -7,6 +7,8 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import torch.utils.data as Data
+import itertools
+from collections import defaultdict
 
 # Dodaj pot za iskanje modulov v mapo Code
 sys.path.append(os.path.join(os.path.dirname(__file__), "Code"))
@@ -15,6 +17,31 @@ from C2FViT_model import C2F_ViT_stage, AffineCOMTransform, Center_of_mass_initi
 from Functions import Dataset_epoch
 from UseCuda import device
 
+# # Pot do vaših slik
+# datapath = "/Data"
+
+# # Najdi vse slike
+# files = sorted(glob.glob(datapath + "/ThoraxCBCT_*.nii.gz"))
+
+# # Razvrsti slike po pacientih
+# patient_images = defaultdict(list)  # Slovar: {patient_id: [list_of_images]}
+# for file in files:
+#     # Razčlenitev imena datoteke
+#     _, patient_id, scan_id = file.split("_")
+#     patient_id = int(patient_id)  # npr. 0000 -> 0
+#     patient_images[patient_id].append(file)
+
+# # Ustvari pare za vsakega pacienta
+# pairs = []
+# for patient_id, images in patient_images.items():
+#     # Ustvari vse možne pare slikanj za tega pacienta
+#     patient_pairs = list(itertools.combinations(images, 2))
+#     pairs.extend(patient_pairs)
+
+# # Rezultat: 'pairs' vsebuje vse pare (slika_A, slika_B)
+# print("Generirani pari:")
+# for pair in pairs:
+#     print(pair)
 
 def dice(im1, atlas):
     unique_class = np.unique(atlas)
@@ -56,8 +83,11 @@ def train():
     loss_similarity = multi_resolution_NCC(win=7, scale=3)
 
     # OASIS
-    imgs = sorted(glob.glob(datapath + "/OASIS_OAS1_*_MR1/norm.nii.gz"))
+    imgs = sorted(glob.glob(datapath + "/ThoraxCBCT_*_*/norm.nii.gz"))
     labels = sorted(glob.glob(datapath + "/OASIS_OAS1_*_MR1/seg35.nii.gz"))
+
+    # imgs = [pair[0] for pair in pairs]
+    # labels=[pair[1] for pair in pairs]
 
     optimizer = torch.optim.Adam(model.parameters(), lr=lr)
     # optimizer = torch.optim.SGD(model.parameters(), lr=lr, momentum=0.9)
