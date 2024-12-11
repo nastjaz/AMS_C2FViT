@@ -86,6 +86,9 @@ def train():
     imgs = sorted(glob.glob(datapath + "/ThoraxCBCT_*_*/norm.nii.gz"))
     labels = sorted(glob.glob(datapath + "/OASIS_OAS1_*_MR1/seg35.nii.gz"))
 
+    print("Najdene slike:", imgs)
+    print("Najdene oznake (labels):", labels)
+
     # imgs = [pair[0] for pair in pairs]
     # labels=[pair[1] for pair in pairs]
 
