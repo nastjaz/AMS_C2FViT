@@ -17,31 +17,6 @@ from C2FViT_model import C2F_ViT_stage, AffineCOMTransform, Center_of_mass_initi
 from Functions import Dataset_epoch
 from UseCuda import device
 
-# # Pot do vaših slik
-# datapath = "/Data"
-
-# # Najdi vse slike
-# files = sorted(glob.glob(datapath + "/ThoraxCBCT_*.nii.gz"))
-
-# # Razvrsti slike po pacientih
-# patient_images = defaultdict(list)  # Slovar: {patient_id: [list_of_images]}
-# for file in files:
-#     # Razčlenitev imena datoteke
-#     _, patient_id, scan_id = file.split("_")
-#     patient_id = int(patient_id)  # npr. 0000 -> 0
-#     patient_images[patient_id].append(file)
-
-# # Ustvari pare za vsakega pacienta
-# pairs = []
-# for patient_id, images in patient_images.items():
-#     # Ustvari vse možne pare slikanj za tega pacienta
-#     patient_pairs = list(itertools.combinations(images, 2))
-#     pairs.extend(patient_pairs)
-
-# # Rezultat: 'pairs' vsebuje vse pare (slika_A, slika_B)
-# print("Generirani pari:")
-# for pair in pairs:
-#     print(pair)
 
 def dice(im1, atlas):
     unique_class = np.unique(atlas)
@@ -83,15 +58,26 @@ def train():
     loss_similarity = multi_resolution_NCC(win=7, scale=3)
 
     # OASIS
-    imgs = sorted(glob.glob(datapath + "/ThoraxCBCT_*_*/norm.nii.gz"))
-    labels = sorted(glob.glob(datapath + "/OASIS_OAS1_*_MR1/seg35.nii.gz"))
+    # imgs = sorted(glob.glob(datapath + "/ThoraxCBCT_*_0000/norm.nii.gz"))
+    # labels = sorted(glob.glob(datapath + "/OASIS_OAS1_*_MR1/seg35.nii.gz"))
 
-    print("Najdene slike:", imgs)
-    print("Najdene oznake (labels):", labels)
+    # Nastavi absolutno pot do mape s podatki
+    datapath = os.path.join(os.path.dirname(os.path.dirname(__file__)), "Data")
+    #print("Trenutna delovna mapa:", os.getcwd())
 
-    # imgs = [pair[0] for pair in pairs]
-    # labels=[pair[1] for pair in pairs]
+    # Debugging: Preveri, ali pot obstaja
+    if not os.path.isdir(datapath):
+        raise FileNotFoundError(f"Mapa s podatki ne obstaja: {datapath}")
 
+    # Preveri in pridobi slike
+    pattern_imgs = os.path.join(datapath, "ThoraxCBCT_*_0000.nii.gz")
+    pattern_label01 = os.path.join(datapath, "ThoraxCBCT_*_0001.nii.gz")
+    pattern_label02 = os.path.join(datapath, "ThoraxCBCT_*_0002.nii.gz")
+
+    imgs = sorted(glob.glob(pattern_imgs))
+    data_labels = sorted(glob.glob(pattern_label01) + glob.glob(pattern_label02))
+
+    
     optimizer = torch.optim.Adam(model.parameters(), lr=lr)
     # optimizer = torch.optim.SGD(model.parameters(), lr=lr, momentum=0.9)
     model_dir = '../Model/' + model_name[0:-1]
@@ -101,7 +87,7 @@ def train():
 
     lossall = np.zeros((2, iteration + 1))
 
-    training_generator = Data.DataLoader(Dataset_epoch(imgs, labels, norm=True, use_label=False),
+    training_generator = Data.DataLoader(Dataset_epoch(imgs, data_labels, norm=True, use_label=False),
                                          batch_size=1,
                                          shuffle=True, num_workers=4)
     step = 0
@@ -236,6 +222,11 @@ if __name__ == '__main__':
                         help="True: Enable Center of Mass initialization, False: Disable")
     opt = parser.parse_args()
 
+    # Dodeli datapath iz opt.datapath
+    datapath = opt.datapath
+
+    print(f"Datapath: {datapath}")
+
     lr = opt.lr
     iteration = opt.iteration
     n_checkpoint = opt.checkpoint
@@ -250,7 +241,7 @@ if __name__ == '__main__':
 
     log_dir = "../Log/" + model_name + ".txt"
 
-    with open(log_dir, "a") as log:
+    with open(log_dir, "w") as log:
         log.write("Validation Dice log for " + model_name[0:-1] + ":\n")
 
     print("Training %s ..." % model_name)
