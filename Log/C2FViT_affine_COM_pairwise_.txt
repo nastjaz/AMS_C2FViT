@@ -1,0 +1,2 @@
+Validation Dice log for C2FViT_affine_COM_pairwise:
+Validation Dice log for C2FViT_affine_COM_pairwise:
