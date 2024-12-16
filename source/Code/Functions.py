@@ -76,8 +76,8 @@ class Dataset_epoch(Data.Dataset):
         img_A = load_4D(self.index_pair[step][0])
         img_B = load_4D(self.index_pair[step][1])
 
-        img_A_label = load_4D(self.index_pair_label[step][0])
-        img_B_label = load_4D(self.index_pair_label[step][1])
+        # img_A_label = load_4D(self.index_pair_label[step][0])
+        # img_B_label = load_4D(self.index_pair_label[step][1])
 
         if self.norm:
             img_A = min_max_norm(img_A)
