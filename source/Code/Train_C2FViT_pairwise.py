@@ -57,8 +57,8 @@ def train():
 
     loss_similarity = multi_resolution_NCC(win=7, scale=3)
     
-    imgs = sorted(glob.glob(datapath + "Data/ThoraxCBCT_*_*.nii.gz"))
-    labels = sorted(glob.glob(datapath + "DataLabels/ThoraxCBCT_*_*.nii.gz"))
+    imgs = sorted(glob.glob(datapath + "/ThoraxCBCT_*_*.nii.gz"))
+    labels = sorted(glob.glob(datapath + "/DataLabels/ThoraxCBCT_*_*.nii.gz"))
 
     print(f"Uvoženih slik: {len(imgs)}, Uvoženih label: {len(labels)}")
 
