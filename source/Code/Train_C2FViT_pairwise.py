@@ -35,7 +35,7 @@ def dice(im1, atlas):
 def train():
     print("Training C2FViT...")
     model = C2F_ViT_stage(img_size=128, patch_size=[3, 7, 15], stride=[2, 4, 8], num_classes=12,
-                          embed_dims=[256, 256, 256],
+                          embed_dims=[256, 192, 192],
                           num_heads=[2, 2, 2], mlp_ratios=[2, 2, 2], qkv_bias=False, qk_scale=None, drop_rate=0.,
                           attn_drop_rate=0., norm_layer=nn.Identity,
                           depths=[4, 4, 4], sr_ratios=[1, 1, 1], num_stages=3, linear=False).cuda()
@@ -56,26 +56,31 @@ def train():
     init_center = Center_of_mass_initial_pairwise()
 
     loss_similarity = multi_resolution_NCC(win=7, scale=3)
+    
+    imgs = sorted(glob.glob(datapath + "Data/ThoraxCBCT_*_*.nii.gz"))
+    labels = sorted(glob.glob(datapath + "DataLabels/ThoraxCBCT_*_*.nii.gz"))
+
+    print(f"Uvoženih slik: {len(imgs)}, Uvoženih label: {len(labels)}")
 
     # OASIS
     # imgs = sorted(glob.glob(datapath + "/ThoraxCBCT_*_0000/norm.nii.gz"))
     # labels = sorted(glob.glob(datapath + "/OASIS_OAS1_*_MR1/seg35.nii.gz"))
 
-    # Nastavi absolutno pot do mape s podatki
-    datapath = os.path.join(os.path.dirname(os.path.dirname(__file__)), "Data")
-    #print("Trenutna delovna mapa:", os.getcwd())
+    # # Nastavi absolutno pot do mape s podatki
+    # datapath = os.path.join(os.path.dirname(os.path.dirname(__file__)), "Data")
+    # #print("Trenutna delovna mapa:", os.getcwd())
 
-    # Debugging: Preveri, ali pot obstaja
-    if not os.path.isdir(datapath):
-        raise FileNotFoundError(f"Mapa s podatki ne obstaja: {datapath}")
+    # # Debugging: Preveri, ali pot obstaja
+    # if not os.path.isdir(datapath):
+    #     raise FileNotFoundError(f"Mapa s podatki ne obstaja: {datapath}")
 
-    # Preveri in pridobi slike
-    pattern_imgs = os.path.join(datapath, "ThoraxCBCT_*_0000.nii.gz")
-    pattern_label01 = os.path.join(datapath, "ThoraxCBCT_*_0001.nii.gz")
-    pattern_label02 = os.path.join(datapath, "ThoraxCBCT_*_0002.nii.gz")
+    # # Preveri in pridobi slike
+    # pattern_imgs = os.path.join(datapath, "ThoraxCBCT_*_0000.nii.gz")
+    # pattern_label01 = os.path.join(datapath, "ThoraxCBCT_*_0001.nii.gz")
+    # pattern_label02 = os.path.join(datapath, "ThoraxCBCT_*_0002.nii.gz")
 
-    imgs = sorted(glob.glob(pattern_imgs))
-    data_labels = sorted(glob.glob(pattern_label01) + glob.glob(pattern_label02))
+    # imgs = sorted(glob.glob(pattern_imgs))
+    # data_labels = sorted(glob.glob(pattern_label01) + glob.glob(pattern_label02))
 
     
     optimizer = torch.optim.Adam(model.parameters(), lr=lr)
@@ -87,7 +92,7 @@ def train():
 
     lossall = np.zeros((2, iteration + 1))
 
-    training_generator = Data.DataLoader(Dataset_epoch(imgs, data_labels, norm=True, use_label=False),
+    training_generator = Data.DataLoader(Dataset_epoch(imgs, labels, norm=True, use_label=False),
                                          batch_size=1,
                                          shuffle=True, num_workers=4)
     step = 0
