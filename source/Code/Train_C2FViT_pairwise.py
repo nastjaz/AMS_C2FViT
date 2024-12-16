@@ -1,3 +1,4 @@
+
 import os
 import glob
 import sys
@@ -7,12 +8,6 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import torch.utils.data as Data
-import itertools
-from collections import defaultdict
-
-# Dodaj pot za iskanje modulov v mapo Code
-sys.path.append(os.path.join(os.path.dirname(__file__), "Code"))
-
 from C2FViT_model import C2F_ViT_stage, AffineCOMTransform, Center_of_mass_initial_pairwise, multi_resolution_NCC
 from Functions import Dataset_epoch
 from UseCuda import device
@@ -35,54 +30,36 @@ def dice(im1, atlas):
 def train():
     print("Training C2FViT...")
     model = C2F_ViT_stage(img_size=128, patch_size=[3, 7, 15], stride=[2, 4, 8], num_classes=12,
-                          embed_dims=[256, 192, 192],
+                          embed_dims=[256, 256, 256],
                           num_heads=[2, 2, 2], mlp_ratios=[2, 2, 2], qkv_bias=False, qk_scale=None, drop_rate=0.,
                           attn_drop_rate=0., norm_layer=nn.Identity,
-                          depths=[4, 4, 4], sr_ratios=[1, 1, 1], num_stages=3, linear=False).cuda()
+                          depths=[4, 4, 4], sr_ratios=[1, 1, 1], num_stages=3, linear=False).to(device)
 
     # model = C2F_ViT_stage(img_size=128, patch_size=[7, 15], stride=[4, 8], num_classes=12, embed_dims=[256, 256],
     #                       num_heads=[2, 2], mlp_ratios=[2, 2], qkv_bias=False, qk_scale=None, drop_rate=0.,
     #                       attn_drop_rate=0., norm_layer=nn.Identity, depths=[4, 4], sr_ratios=[1, 1], num_stages=2,
-    #                       linear=False).cuda()
+    #                       linear=False).to(device)
 
     # model = C2F_ViT_stage(img_size=128, patch_size=[15], stride=[8], num_classes=12, embed_dims=[256],
     #                       num_heads=[2], mlp_ratios=[2], qkv_bias=False, qk_scale=None, drop_rate=0.,
     #                       attn_drop_rate=0., norm_layer=nn.Identity, depths=[4], sr_ratios=[1], num_stages=1,
-    #                       linear=False).cuda()
+    #                       linear=False).to(device)
 
     # print(sum(p.numel() for p in model.parameters() if p.requires_grad))
 
-    affine_transform = AffineCOMTransform().cuda()
+    affine_transform = AffineCOMTransform().to(device)
     init_center = Center_of_mass_initial_pairwise()
 
     loss_similarity = multi_resolution_NCC(win=7, scale=3)
-    
+
+    # # OASIS
+    # imgs = sorted(glob.glob(datapath + "/OASIS_OAS1_*_MR1/norm.nii.gz"))
+    # labels = sorted(glob.glob(datapath + "/OASIS_OAS1_*_MR1/seg35.nii.gz"))
+
     imgs = sorted(glob.glob(datapath + "/ThoraxCBCT_*_*.nii.gz"))
     labels = sorted(glob.glob(datapath + "/DataLabels/ThoraxCBCT_*_*.nii.gz"))
 
-    print(f"Uvoženih slik: {len(imgs)}, Uvoženih label: {len(labels)}")
 
-    # OASIS
-    # imgs = sorted(glob.glob(datapath + "/ThoraxCBCT_*_0000/norm.nii.gz"))
-    # labels = sorted(glob.glob(datapath + "/OASIS_OAS1_*_MR1/seg35.nii.gz"))
-
-    # # Nastavi absolutno pot do mape s podatki
-    # datapath = os.path.join(os.path.dirname(os.path.dirname(__file__)), "Data")
-    # #print("Trenutna delovna mapa:", os.getcwd())
-
-    # # Debugging: Preveri, ali pot obstaja
-    # if not os.path.isdir(datapath):
-    #     raise FileNotFoundError(f"Mapa s podatki ne obstaja: {datapath}")
-
-    # # Preveri in pridobi slike
-    # pattern_imgs = os.path.join(datapath, "ThoraxCBCT_*_0000.nii.gz")
-    # pattern_label01 = os.path.join(datapath, "ThoraxCBCT_*_0001.nii.gz")
-    # pattern_label02 = os.path.join(datapath, "ThoraxCBCT_*_0002.nii.gz")
-
-    # imgs = sorted(glob.glob(pattern_imgs))
-    # data_labels = sorted(glob.glob(pattern_label01) + glob.glob(pattern_label02))
-
-    
     optimizer = torch.optim.Adam(model.parameters(), lr=lr)
     # optimizer = torch.optim.SGD(model.parameters(), lr=lr, momentum=0.9)
     model_dir = '../Model/' + model_name[0:-1]
@@ -108,8 +85,8 @@ def train():
     while step <= iteration:
         for X, Y in training_generator:
 
-            X = X.cuda().float()
-            Y = Y.cuda().float()
+            X = X.to(device).float()
+            Y = Y.to(device).float()
 
             # COM initialization
             if com_initial:
@@ -227,11 +204,6 @@ if __name__ == '__main__':
                         help="True: Enable Center of Mass initialization, False: Disable")
     opt = parser.parse_args()
 
-    # Dodeli datapath iz opt.datapath
-    datapath = opt.datapath
-
-    print(f"Datapath: {datapath}")
-
     lr = opt.lr
     iteration = opt.iteration
     n_checkpoint = opt.checkpoint
@@ -246,7 +218,7 @@ if __name__ == '__main__':
 
     log_dir = "../Log/" + model_name + ".txt"
 
-    with open(log_dir, "w") as log:
+    with open(log_dir, "a") as log:
         log.write("Validation Dice log for " + model_name[0:-1] + ":\n")
 
     print("Training %s ..." % model_name)
