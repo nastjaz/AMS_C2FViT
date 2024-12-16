@@ -57,7 +57,7 @@ def train():
     # labels = sorted(glob.glob(datapath + "/OASIS_OAS1_*_MR1/seg35.nii.gz"))
 
     imgs = sorted(glob.glob(datapath + "/ThoraxCBCT_*_*.nii.gz"))
-    labels = sorted(glob.glob(datapath + "/DataLabels/ThoraxCBCT_*_*.nii.gz"))
+    labels = sorted(glob.glob(datapath + "/labels/ThoraxCBCT_*_*.nii.gz"))
 
 
     optimizer = torch.optim.Adam(model.parameters(), lr=lr)
