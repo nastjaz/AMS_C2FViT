@@ -1,0 +1,1 @@
+Validation Dice log for CBCT_affineC2FViT_8000:
