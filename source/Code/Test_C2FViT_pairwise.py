@@ -139,7 +139,7 @@ if __name__ == '__main__':
             crop_indices[0][0]:crop_indices[0][1],
             crop_indices[1][0]:crop_indices[1][1],
             crop_indices[2][0]:crop_indices[2][1],
- +       ]
+        ]
     
         print(f"Cropped image size: {cropped_array.shape}")
         return cropped_array
@@ -157,6 +157,7 @@ if __name__ == '__main__':
         X_Y_cpu = X_Y.data.cpu().numpy()[0, 0, :, :, :]
         #affine_matrix_cpu = affine_matrix.cpu()
         print(affine_matrix.cpu().numpy().shape)
+        print(affine_matrix.cpu().numpy())
         #affine_matrix_cpu = affine_matrix.cpu().numpy()[0, 0, :, :, :]
 
         target_size2 = (256, 192, 192)
