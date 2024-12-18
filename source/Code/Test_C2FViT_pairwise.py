@@ -73,19 +73,36 @@ if __name__ == '__main__':
         fixed_img = np.clip(fixed_img, a_min=2500, a_max=np.max(fixed_img))
 
     moving_img = load_4D(moving_path)
+    print(moving_img.shape)
+    print(fixed_img.shape)
 
     fixed_img = min_max_norm(fixed_img)
     moving_img = min_max_norm(moving_img)
 
     def add_padding_to_image(image, target_size=(1, 256, 256, 256), padding_value=0):
-        # Pretvori sliko v NumPy array
-        original_size = image
-        # Izračun paddinga
-        padding = [(0, target_size[i] - original_size[i]) for i in range(4)]
-        print(f"Image shape: {image_array.shape}")
-        print(f"Padding shape: {padding}")
+        if not isinstance(image, np.ndarray):
+            image_array = np.array(image)
+        else:
+            image_array = image
+
+        # Velikost originalne slike
+        original_size = image_array.shape
+
+        # Izračun paddinga samo na koncu dimenzij
+        padding = [(0, max(target_size[i] - original_size[i], 0)) for i in range(len(original_size))]
+    
+        # Dodaj padding za dodatne dimenzije, če target_size vsebuje več dimenzij
+        if len(target_size) > len(original_size):
+            padding += [(0, 0)] * (len(target_size) - len(original_size))
+        
+        print(f"Original size: {original_size}")
+        print(f"Target size: {target_size}")
+        print(f"Padding to add: {padding}")
+
         # Dodajanje paddinga
         padded_array = np.pad(image_array, pad_width=padding, mode='constant', constant_values=padding_value)
+
+        print(f"Padded image shape: {padded_array.shape}")
         return padded_array
 
     target_size = (1, 256, 256, 256)
@@ -96,19 +113,36 @@ if __name__ == '__main__':
     moving_img = torch.from_numpy(moving_img).float().to(device).unsqueeze(dim=0)
 
     def crop_image(image, target_size=(256, 192, 192)):
-            # Pretvori sliko v NumPy array
+        # Preverimo, da je vhodna slika NumPy array
+        if not isinstance(image, np.ndarray):
+            image_array = np.array(image)
+        else:
             image_array = image
-            # Prvotna velikost
-            original_size = image_array.shape  # Oblika v (z, y, x)
-            # Izračun začetnega indeksa za crop v vsaki dimenziji
-            crop = [(0, original_size[i] - target_size[i]) if original_size[i] > target_size[i] else (0, 0) for i in range(3)]
-            # Izrežemo sliko
-            cropped_array = image_array[
-                crop[0][0]:original_size[0] - crop[0][1], 
-                crop[1][0]:original_size[1] - crop[1][1], 
-                crop[2][0]:original_size[2] - crop[2][1]
-            ]
-            return cropped_array
+
+        # Velikost originalne slike
+        padded_size = image_array.shape
+
+       # Izračun začetnih in končnih indeksov za crop v vsaki dimenziji
+        crop_indices = [
+            (0, min(target_size[i], padded_size[i]))  # Ohranimo samo del, ki ustreza ciljni velikosti
+            for i in range(len(target_size))
+        ]
+
+        # Dodamo preostale dimenzije, če jih target_size nima
+        crop_indices += [(0, padded_size[i]) for i in range(len(target_size), len(padded_size))]
+
+        print(f"Padded size: {padded_size}")
+        print(f"Cropping indices: {crop_indices}")
+
+        # Izrežemo sliko
+        cropped_array = image_array[
+            crop_indices[0][0]:crop_indices[0][1],
+            crop_indices[1][0]:crop_indices[1][1],
+            crop_indices[2][0]:crop_indices[2][1],
+        ]
+    
+        print(f"Cropped image size: {cropped_array.shape}")
+        return cropped_array
 
     with torch.no_grad():
         if com_initial:
