@@ -139,7 +139,7 @@ if __name__ == '__main__':
             crop_indices[0][0]:crop_indices[0][1],
             crop_indices[1][0]:crop_indices[1][1],
             crop_indices[2][0]:crop_indices[2][1],
-        ]
+ +       ]
     
         print(f"Cropped image size: {cropped_array.shape}")
         return cropped_array
