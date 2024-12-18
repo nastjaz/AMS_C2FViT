@@ -3,11 +3,13 @@ import matplotlib.pyplot as plt
 import numpy as np
 from nibabel.processing import resample_from_to
 import os
+import scipy
 
 # Pot do tvojih .nii.gz datotek
-fixed_path = r'..\Data\ThoraxCBCT_0000_0000.nii.gz'
-moving_path = r'..\Data\ThoraxCBCT_0000_0001.nii.gz'
-warped_path = r'..\..\Result\warped_ThoraxCBCT_0000_0001.nii.gz'
+fixed_path = os.path.join("..", "Data", "ThoraxCBCT_0000_0000.nii.gz")
+moving_path = os.path.join("..", "Data", "ThoraxCBCT_0000_0001.nii.gz")
+result_dir = os.path.join("..", "..", "Result")
+warped_path = os.path.join(result_dir, "warped_ThoraxCBCT_0000_0001.nii.gz")
 
 # Preveri, ali poti obstajajo
 if not os.path.exists(fixed_path):
