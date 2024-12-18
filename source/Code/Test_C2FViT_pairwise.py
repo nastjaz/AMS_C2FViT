@@ -77,17 +77,18 @@ if __name__ == '__main__':
     fixed_img = min_max_norm(fixed_img)
     moving_img = min_max_norm(moving_img)
 
-    def add_padding_to_image(image, target_size=(256, 256, 256), padding_value=0):
+    def add_padding_to_image(image, target_size=(1, 256, 256, 256), padding_value=0):
         # Pretvori sliko v NumPy array
-        image_array = image
-        # Prvotna velikost
-        original_size = image_array.shape  # Oblika v (z, y, x)
+        original_size = image
         # Izračun paddinga
-        padding = [(0, target_size[i] - original_size[i]) for i in range(3)]
+        padding = [(0, target_size[i] - original_size[i]) for i in range(4)]
+        print(f"Image shape: {image_array.shape}")
+        print(f"Padding shape: {padding}")
         # Dodajanje paddinga
         padded_array = np.pad(image_array, pad_width=padding, mode='constant', constant_values=padding_value)
         return padded_array
 
+    target_size = (1, 256, 256, 256)
     fixed_img = add_padding_to_image(fixed_img, target_size=target_size)
     moving_img = add_padding_to_image(moving_img, target_size=target_size)
 
@@ -124,7 +125,8 @@ if __name__ == '__main__':
         print(affine_matrix.cpu().numpy().shape)
         #affine_matrix_cpu = affine_matrix.cpu().numpy()[0, 0, :, :, :]
 
-        X_Y_cpu = crop_image(X_Y_cpu, target_size=target_size)
+        target_size2 = (256, 192, 192)
+        X_Y_cpu = crop_image(X_Y_cpu, target_size=target_size2)
         #affine_matrix_cpu = 
         save_img(X_Y_cpu, f"{savepath}/warped_{moving_base}", header=header, affine=affine)
         #save_affine_transform(affine_matrix_cpu, f"{savepath}/transform_{moving_base}", header=header, affine=affine)
