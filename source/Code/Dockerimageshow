@@ -1,0 +1,23 @@
+# Uporabi osnovno sliko z Pythonom
+FROM python:3.10-slim
+
+# Nastavi delovni direktorij v kontejnerju
+WORKDIR /app
+
+# Kopiraj vse datoteke iz trenutne mape v kontejner
+COPY . /app
+
+# Namesti sistemske odvisnosti
+RUN apt-get update && apt-get install -y \
+    libgl1-mesa-glx \
+    libglib2.0-0 \
+    && rm -rf /var/lib/apt/lists/*
+
+# Namesti Python odvisnosti
+RUN pip install --no-cache-dir \
+    nibabel \
+    matplotlib \
+    numpy
+
+# Določi privzeti ukaz za zagon
+CMD ["python3", "ImageShow.py"]
