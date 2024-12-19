@@ -285,9 +285,12 @@ class C2F_ViT_stage(nn.Module):
                 warpped_x, _ = self.affine_transform(x[i + 1], affine)
                 warpped_x_list.append(warpped_x)
 
+                # print("1", xy_fea.shape)
                 xy_fea = xy_fea.reshape(B, H, W, D, -1).permute(0, 4, 1, 2, 3)
+                # print("2",xy_fea.shape)
                 squeeze = getattr(self, f"squeeze_{i + 1}")
                 xy_fea = squeeze(xy_fea).flatten(2).transpose(1, 2)
+                # print("3",xy_fea.shape)
             else:
                 warpped_x, _ = self.affine_transform(x[i], affine)
                 warpped_x_list.append(warpped_x)

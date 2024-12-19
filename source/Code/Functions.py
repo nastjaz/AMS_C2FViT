@@ -14,9 +14,17 @@ def load_4D(name):
     # X = sitk.GetArrayFromImage(sitk.ReadImage(name, sitk.sitkFloat32 ))
     # X = np.reshape(X, (1,)+ X.shape)
     X = nib.load(name)
+    img_nii = nib.load(name)
     X = X.get_fdata()
     X = np.reshape(X, (1,) + X.shape)
-    return X
+
+    # Pridobi header in affine matriko
+    header = img_nii.header
+    affine = img_nii.affine
+    #print(header)
+    #print(affine)
+
+    return X, header, affine
 
 
 def load_4D_channel(name):

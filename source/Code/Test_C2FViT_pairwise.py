@@ -72,7 +72,7 @@ if __name__ == '__main__':
     if fixed_base == "MNI152_T1_1mm_brain_pad_RSP.nii.gz":
         fixed_img = np.clip(fixed_img, a_min=2500, a_max=np.max(fixed_img))
 
-    moving_img = load_4D(moving_path)
+    moving_img, moving_header, moving_affine = load_4D(moving_path)
     print(moving_img.shape)
     print(fixed_img.shape)
 
@@ -137,6 +137,37 @@ if __name__ == '__main__':
         print(f"Cropped image size: {cropped_array.shape}")
         return cropped_array
 
+        
+    def crop_deformation_field(image, target_size=(3, 256, 192, 192)):
+        # Preverimo, da je vhodna slika NumPy array
+        if not isinstance(image, np.ndarray):
+            image_array = np.array(image)
+        else:
+            image_array = image
+
+        # Velikost originalne slike
+        padded_size = image_array.shape
+
+        # Izračunamo, koliko odrezati na vsaki dimenziji (y, x, z)
+        crop_indices = [(0, 0), (0, target_size[0]), (0, target_size[1]), (0, target_size[2])]
+
+        # Predpostavljamo, da je image_array oblika (kanali, x, y, z)
+        # crop_indices je v obliki [(0, 0), (0, 256), (0, 192), (0, 192)]
+        # Izrežemo sliko
+        cropped_array = image_array[
+            :target_size[0],
+            :target_size[1],  # x-dimenzija
+            :target_size[2],  # y-dimenzija
+            :target_size[3],  # z-dimenzija
+        ]
+
+
+        print(f"Padded size: {padded_size}")
+        print(f"Cropping indices: {crop_indices}")
+        print(f"Cropped image size: {cropped_array.shape}")
+        return cropped_array
+   
+
     with torch.no_grad():
         if com_initial:
             moving_img, init_flow = init_center(moving_img, fixed_img)
@@ -144,19 +175,78 @@ if __name__ == '__main__':
         X_down = F.interpolate(moving_img, scale_factor=0.5, mode="trilinear", align_corners=True)
         Y_down = F.interpolate(fixed_img, scale_factor=0.5, mode="trilinear", align_corners=True)
 
+        # warpped_x_list, y_list, affine_para_list = model(X_down, Y_down)
         warpped_x_list, y_list, affine_para_list = model(X_down, Y_down)
         X_Y, affine_matrix = affine_transform(moving_img, affine_para_list[-1])
+        # print(len(warpped_x_list))
+        # print(warpped_x_list[0].shape)
+        # print(warpped_x_list[1].shape)
+        # print(warpped_x_list[2].shape)
+
+        # print(len(affine_para_list))
+        # print(affine_para_list)
+
 
         X_Y_cpu = X_Y.data.cpu().numpy()[0, 0, :, :, :]
-        #affine_matrix_cpu = affine_matrix.cpu()
-        print(affine_matrix.cpu().numpy().shape)
-        print(affine_matrix.cpu().numpy())
-        #affine_matrix_cpu = affine_matrix.cpu().numpy()[0, 0, :, :, :]
+        image_shape = X_Y.data.cpu().numpy()[0, 0, :, :, :].shape
+        print(f"Velikost slike wraped:{image_shape}")
+        
 
+        affine_matrix = affine_matrix.cpu().numpy()
+        affine_matrix = np.squeeze(affine_matrix)  # Odstrani nepotrebno zunanjo dimenzijo
+
+        print(f"Afina matrika: {affine_matrix}")
+        
+        deformation_field_translation = np.ones((256, 256, 256))
+
+        deformation_field_x = np.ones((256, 256, 256)) * affine_matrix[0,3]
+        deformation_field_y = np.ones((256, 256, 256)) * affine_matrix[1,3]
+        deformation_field_z = np.ones((256, 256, 256)) * affine_matrix[2,3]
+
+        deformation_field_translation = np.array([deformation_field_x, deformation_field_y, deformation_field_z])
+        #print(deformation_field_translation)
+
+        # Generiraj mrežo koordinat [x, y, z]
+        x = np.arange(image_shape[0])
+        y = np.arange(image_shape[1])
+        z = np.arange(image_shape[2])
+        x_grid, y_grid, z_grid = np.meshgrid(x, y, z, indexing='ij')
+
+        # Preoblikuj mrežo koordinat v seznam točk
+        points = np.vstack([x_grid.ravel(), y_grid.ravel(), z_grid.ravel(), np.ones(x_grid.size)])
+
+        # Transformiraj točke z afino matriko
+        transformed_points = affine @ points  # (3x4) * (4xN)
+
+        # Razdeli transformirane točke na x', y', z'
+        x_prime = transformed_points[0, :].reshape(image_shape)
+        y_prime = transformed_points[1, :].reshape(image_shape)
+        z_prime = transformed_points[2, :].reshape(image_shape)
+        # Izpis informacij
+        print("Oblika transformiranih koordinat:", x_prime.shape, y_prime.shape, z_prime.shape)
+        
+        deformation_field = np.array([x_prime, y_prime, z_prime])
+        
         target_size2 = (256, 192, 192)
         X_Y_cpu = crop_image(X_Y_cpu, target_size=target_size2)
-        #affine_matrix_cpu = 
+
+        target_size3 = (3, 256, 192, 192)
+        deformation_ = crop_deformation_field(deformation_field, target_size=target_size3)
+         
+        # Pretvori numpy array v SimpleITK Image
+        deformation_sitk = sitk.GetImageFromArray(deformation_.transpose(1, 2, 3, 0))  # Transpose to match ITK's order (z, y, x, vector_size)
+
+        # Nastavi SimpleITK deformacijsko sliko
+        deformation_sitk.SetDirection(moving_header['srow_x'][:3])  # Usmerjenost slike
+        deformation_sitk.SetOrigin([moving_header['qoffset_x'], moving_header['qoffset_y'], moving_header['qoffset_z']])  # Izvor
+        deformation_sitk.SetSpacing(moving_header['pixdim'][1:4])  # Razmik med pikami
+
+        # Shrani sliko
+        sitk.WriteImage(deformation_sitk, f"{savepath}/deformation_field_{moving_base}.nii.gz")
+
         save_img(X_Y_cpu, f"{savepath}/warped_{moving_base}", header=header, affine=affine)
+        # Shrani v .nii.gz format
+        sitk.WriteImage(deformation_sitk, f"{savepath}/deformation_field_{moving_base}.nii.gz")
         #save_affine_transform(affine_matrix_cpu, f"{savepath}/transform_{moving_base}", header=header, affine=affine)
 
     print("Result saved to :", savepath)
