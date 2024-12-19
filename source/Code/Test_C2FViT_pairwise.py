@@ -122,25 +122,18 @@ if __name__ == '__main__':
         # Velikost originalne slike
         padded_size = image_array.shape
 
-       # Izračun začetnih in končnih indeksov za crop v vsaki dimenziji
-        crop_indices = [
-            (0, min(target_size[i], padded_size[i]))  # Ohranimo samo del, ki ustreza ciljni velikosti
-            for i in range(len(target_size))
-        ]
-
-        # Dodamo preostale dimenzije, če jih target_size nima
-        crop_indices += [(0, padded_size[i]) for i in range(len(target_size), len(padded_size))]
-
-        print(f"Padded size: {padded_size}")
-        print(f"Cropping indices: {crop_indices}")
+       # Izračunamo, koliko odrezati na vsaki dimenziji (y in x)
+        crop_indices = [(0, target_size[i]) if i == 0 else (0, target_size[i]) for i in range(3)]
 
         # Izrežemo sliko
         cropped_array = image_array[
-            crop_indices[0][0]:crop_indices[0][1],
-            crop_indices[1][0]:crop_indices[1][1],
-            crop_indices[2][0]:crop_indices[2][1],
+            :target_size[1],  # z-dimenzija
+            :target_size[2],  # y-dimenzija
+            :target_size[0],  # x-dimenzija
         ]
-    
+
+        print(f"Padded size: {padded_size}")
+        print(f"Cropping indices: {crop_indices}")
         print(f"Cropped image size: {cropped_array.shape}")
         return cropped_array
 

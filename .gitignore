@@ -8,6 +8,17 @@
 .vscode/
 .idea/s
 
+# Ignoriraj __pycache__ mapo
+__pycache__/
+
 # Ignoriraj slike
 *.nii.gz
 *.csv
+
+# Ignoriraj datoteke v formatu .txt in .npy (če so to datoteke, ki se ustvarijo med učenjem)
+*.txt
+*.npy
+
+# Ignoriraj mapo Model in Log
+Model/
+Log/
