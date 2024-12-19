@@ -22,3 +22,4 @@ __pycache__/
 # Ignoriraj mapo Model in Log
 Model/
 Log/
+Figure/
