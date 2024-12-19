@@ -20,6 +20,7 @@ __pycache__/
 *.npy
 
 # Ignoriraj mapo Model in Log
-Model/
+Model/*
+!Source/Model/*.pth
 Log/
 Figure/
