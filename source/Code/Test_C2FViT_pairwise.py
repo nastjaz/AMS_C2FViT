@@ -127,9 +127,9 @@ if __name__ == '__main__':
 
         # Izrežemo sliko
         cropped_array = image_array[
-            :target_size[1],  # z-dimenzija
-            :target_size[2],  # y-dimenzija
             :target_size[0],  # x-dimenzija
+            :target_size[1],  # y-dimenzija
+            :target_size[2],  # z-dimenzija
         ]
 
         print(f"Padded size: {padded_size}")
