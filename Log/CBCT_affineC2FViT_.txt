@@ -1,4 +1,0 @@
-Validation Dice log for CBCT_affineC2FViT:
-Validation Dice log for CBCT_affineC2FViT:
-Validation Dice log for CBCT_affineC2FViT:
-Validation Dice log for CBCT_affineC2FViT:
