@@ -231,8 +231,10 @@ if __name__ == '__main__':
         X_Y_cpu = crop_image(X_Y_cpu, target_size=target_size2)
 
         target_size3 = (3, 256, 192, 192)
-        deformation_ = crop_deformation_field(deformation_field, target_size=target_size3)
-         
+        deformation_temp = crop_deformation_field(deformation_field, target_size=target_size3)
+        deformation_ = np.transpose(deformation_temp, (1, 2, 3, 0))
+        print(deformation_.shape)
+
         # Pretvori numpy array v SimpleITK Image
         deformation_sitk = sitk.GetImageFromArray(deformation_.transpose(1, 2, 3, 0))  # Transpose to match ITK's order (z, y, x, vector_size)
 
