@@ -240,9 +240,10 @@ if __name__ == '__main__':
 
         # Ustvarite NIfTI sliko iz deformacijskega polja
         nifti_img = nib.Nifti1Image(deformation_, affine=affine_matrix_4x4)
+        print(f"Oblika podatkov v NIfTI sliki: {nifti_img.shape}")
 
         # Shrani NIfTI sliko
-        output_path = f"{savepath}/deformation_field_{moving_base}.nii.gz"
+        output_path = f"{savepath}/deformation_field_{moving_base}"
         nib.save(nifti_img, output_path)
         
         save_img(X_Y_cpu, f"{savepath}/warped_{moving_base}", header=header, affine=affine)
