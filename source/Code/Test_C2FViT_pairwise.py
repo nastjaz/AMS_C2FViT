@@ -216,7 +216,7 @@ if __name__ == '__main__':
         points = np.vstack([x_grid.ravel(), y_grid.ravel(), z_grid.ravel(), np.ones(x_grid.size)])
 
         # Transformiraj točke z afino matriko
-        transformed_points = affine @ points  # (3x4) * (4xN)
+        transformed_points = affine_matrix @ points  # (3x4) * (4xN)
 
         # Razdeli transformirane točke na x', y', z'
         x_prime = transformed_points[0, :].reshape(image_shape)
@@ -225,7 +225,13 @@ if __name__ == '__main__':
         # Izpis informacij
         print("Oblika transformiranih koordinat:", x_prime.shape, y_prime.shape, z_prime.shape)
         
-        deformation_field = np.array([x_prime, y_prime, z_prime])
+        # Izračunaj deformacijsko polje (difference med x', y', z' in originalnimi koordinatami)
+        def_field_x = x_prime - x_grid
+        def_field_y = y_prime - y_grid
+        def_field_z = z_prime - z_grid
+
+        # Oblika deformacijskega polja: [def_field_x, def_field_y, def_field_z]
+        deformation_field = np.array([def_field_x, def_field_y, def_field_z])
         
         target_size2 = (256, 192, 192)
         X_Y_cpu = crop_image(X_Y_cpu, target_size=target_size2)
