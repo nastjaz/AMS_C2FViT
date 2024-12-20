@@ -256,7 +256,7 @@ if __name__ == '__main__':
         output_path = f"{savepath}/disp_{fixed_base1}_{moving_base1}.nii.gz"
         nib.save(nifti_img, output_path)
         
-        save_img(X_Y_cpu, f"{savepath}/warped_{moving_base}", header=header, affine=affine)
+        save_img(X_Y_cpu, f"{savepath}/warped_{fixed_base1}_{moving_base1}.nii.gz", header=header, affine=affine)
         #save_affine_transform(affine_matrix_cpu, f"{savepath}/transform_{moving_base}", header=header, affine=affine)
 
     print("Result saved to :", savepath)
