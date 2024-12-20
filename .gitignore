@@ -23,4 +23,3 @@ __pycache__/
 Model/*
 !Source/Model/*.pth
 Log/
-Figure/
