@@ -40,25 +40,31 @@ First command builds a Docker image named my-docker-image from a Dockerfile in t
 `docker build -t my-docker-image -f Dockerfile .`
 
 
-Second command runs a container based on this image to execute a Python script with specific arguments for model inference in an image registration task.
-
-`docker run --name {name of a container} --runtime=nvidia -it --rm -v $(pwd):/workdir --workdir {workdir} python3 Test_C2FViT_pairwise.py --modelpath {model_path} --fixed {fixed_img_path} --moving {moving_img_path}`
-
 ### Example
 `docker run --name new-container --runtime=nvidia -it --rm -v $(pwd):/workdir --workdir /workdir/source my-docker-image python3 Code/Test_C2FViT_pairwise.py --modelpath Model/CBCT_affineC2FViT_1000stagelvl3_0.pth --fixed Data/validation/ThoraxCBCT_0011_0001.nii.gz --moving Data/validation/ThoraxCBCT_0011_0000.nii.gz`
 
 
 ## Data Preparation
 
-The original images in our dataset have dimensions of 256x192x192. However, to train the model, the input images need to be resized to 256x256x256. This resizing is achieved through padding. Specifically, we use the ImageResize.py function, which adds padding to the images to ensure they reach the required dimensions of 256x256x256. The padded images are then saved in the "Data" directory, where they are ready for use in training the model.
+The original images in our dataset have dimensions of 256x192x192. However, to train the model, the input images need to be resized to 256x256x256. This resizing is achieved through padding. Specifically, we use the `ImageResize.py` function, which adds padding to the images to ensure they reach the required dimensions of 256x256x256. The padded images are then saved in the `Data` directory, where they are ready for use in training the model.
 
-The data preparation process begins with loading the original images (imagesTr) and labels (labelsTr) into the "source/OriginalData" and "source/OriginalLabels" directories. The images are then processed using the ImageResize.py function located in the "Code" directory(the same padding process is applied for both images and labels; it is only necessary to comment and uncomment the respective code for images or labels). This function resizes and adds padding to the images and labels, ensuring they conform to the desired dimensions. The processed images are saved in the "Data" and "Labels" directory, which is later used for training the model.
+The data preparation process begins with loading the original images (imagesTr) and labels (labelsTr) into the `source/OriginalData` and `source/OriginalLabels` directories. The images are then processed using the `ImageResize.py` function located in the `Code` directory(the same padding process is applied for both images and labels; it is only necessary to comment and uncomment the respective code for images or labels). This function resizes and adds padding to the images and labels, ensuring they conform to the desired dimensions. The processed images are saved in the `Data` and `Labels` directory, which is later used for training the model.
+
+It is important to note that resizing the data is only required for training with the `Train_C2FViT.py` function.
 
 
-## Train Commands
+## Train Command
 
 `docker run --name {name of a container} --runtime=nvidia -it --rm -v $(pwd):/workdir --workdir {workdir} --shm-size=8g my-docker-image python3 Train_C2FViT_pairwise.py --modelname {model_name} --lr 1e-4 --iteration 1000 --checkpoint 1000 --datapath {data_path} --com_initial True`
 
 ### Example
 `docker run --name new-container --runtime=nvidia -it --rm -v $(pwd):/workdir --workdir /workdir/source --shm-size=8g my-docker-image python3 Code/Train_C2FViT_pairwise.py --modelname CBCT_affineC2FViT_10000 --lr 1e-4 --iteration 1000 --checkpoint 1000 --datapath Data --com_initial True`
 
+
+## Test Command
+
+`docker run --name {name of a container} --runtime=nvidia -it --rm -v $(pwd):/workdir --workdir {workdir} python3 Test_C2FViT_pairwise.py --modelpath {model_path} --fixed {fixed_img_path} --moving {moving_img_path}`
+
+### Example
+
+docker run --name new-container --runtime=nvidia -it --rm -v $(pwd):/workdir --workdir /workdir/source my-docker-image python3 Code/Test_C2FViT_pairwise.py --modelpath Model/CBCT_affineC2FViT_1000stagelvl3_0.pth --fixed OriginalData/validation/ThoraxCBCT_0011_0001.nii.gz --moving OriginalData/validation/ThoraxCBCT_0011_0000.nii.gz
