@@ -248,8 +248,12 @@ if __name__ == '__main__':
         nifti_img = nib.Nifti1Image(deformation_, affine=affine_matrix_4x4)
         print(f"Oblika podatkov v NIfTI sliki: {nifti_img.shape}")
 
+        # Odstranite končnico '.nii.gz' iz obeh
+        fixed_base1 = fixed_base.replace('.nii.gz', '').replace('ThoraxCBCT_', '')
+        moving_base1 = moving_base.replace('.nii.gz', '').replace('ThoraxCBCT_', '')
+        
         # Shrani NIfTI sliko
-        output_path = f"{savepath}/deformation_field_{moving_base}"
+        output_path = f"{savepath}/disp_{fixed_base1}_{moving_base1}.nii.gz"
         nib.save(nifti_img, output_path)
         
         save_img(X_Y_cpu, f"{savepath}/warped_{moving_base}", header=header, affine=affine)
