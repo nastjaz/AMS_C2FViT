@@ -22,10 +22,13 @@ def add_padding_to_image(image, target_size=(256, 256, 256), padding_value=0):
     final_image.SetDirection(image.GetDirection())  # Ohranimo direction
     return final_image
 
-# Pot do map
+# Pot do map slik
 input_dir = "/media/FastDataMama/nastjaz/AMS_C2FViT/source/OriginalData"
 output_dir = "/media/FastDataMama/nastjaz/AMS_C2FViT/source/Data"
 
+# Pot do map labels
+# input_dir = "/media/FastDataMama/nastjaz/AMS_C2FViT/source/OriginalLabels"
+# output_dir = "/media/FastDataMama/nastjaz/AMS_C2FViT/source/Data/labels"
 
 # Ustvari izhodno mapo, če ne obstaja
 if not os.path.exists(output_dir):

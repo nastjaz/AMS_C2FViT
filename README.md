@@ -5,6 +5,7 @@ Affine Medical Image Registration with Coarse-to-Fine Vision Transformer (C2FViT
 
 https://github.com/nastjaz/AMS_C2FViT.git
 
+
 ## Method Explanation
 This is the official Pytorch implementation of "Affine Medical Image Registration with Coarse-to-Fine Vision Transformer" (CVPR 2022), written by Tony C. W. Mok and Albert C. S. Chung.
 
@@ -31,6 +32,7 @@ aggregated_results:
 
 ![plot](./source/Figure/0011.png?raw=true)
 
+
 ## Docker Information
 
 First command builds a Docker image named my-docker-image from a Dockerfile in the current directory (AMS_C2FViT).
@@ -45,52 +47,18 @@ docker run --name {name of a container} --runtime=nvidia -it --rm -v $(pwd):/wor
 ### Example
 docker run --name new-container --runtime=nvidia -it --rm -v $(pwd):/workdir --workdir /workdir/source my-docker-image python3 Code/Test_C2FViT_pairwise.py --modelpath Model/CBCT_affineC2FViT_1000stagelvl3_0.pth --fixed Data/validation/ThoraxCBCT_0011_0001.nii.gz --moving Data/validation/ThoraxCBCT_0011_0000.nii.gz
 
+
 ## Data Preparation
-Explain the steps required to prepare the data for training. Include any preprocessing steps and data splitting.
+
+The original images in our dataset have dimensions of 256x192x192. However, to train the model, the input images need to be resized to 256x256x256. This resizing is achieved through padding. Specifically, we use the ImageResize.py function, which adds padding to the images to ensure they reach the required dimensions of 256x256x256. The padded images are then saved in the "Data" directory, where they are ready for use in training the model.
+
+The data preparation process begins with loading the original images (imagesTr) and labels (labelsTr) into the "source/OriginalData" and "source/OriginalLabels" directories. The images are then processed using the ImageResize.py function located in the "Code" directory(the same padding process is applied for both images and labels; it is only necessary to comment and uncomment the respective code for images or labels). This function resizes and adds padding to the images and labels, ensuring they conform to the desired dimensions. The processed images are saved in the "Data" and "Labels" directory, which is later used for training the model.
+
 
 ## Train Commands
-If applicable, list the commands needed to train your model. Provide any necessary explanations or parameters. 
-For train.py script, you should use a parser to set all input parameters. Below is the example, how to run `train.py`:
 
+docker run --name {name of a container} --runtime=nvidia -it --rm -v $(pwd):/workdir --workdir {workdir} --shm-size=8g my-docker-image python3 Train_C2FViT_pairwise.py --modelname {model_name} --lr 1e-4 --iteration 1000 --checkpoint 1000 --datapath {data_path} --com_initial True
 
+### Example
+docker run --name new-container --runtime=nvidia -it --rm -v $(pwd):/workdir --workdir /workdir/source --shm-size=8g my-docker-image python3 Code/Train_C2FViT_pairwise.py --modelname CBCT_affineC2FViT_10000 --lr 1e-4 --iteration 1000 --checkpoint 1000 --datapath Data --com_initial True
 
-
-
-`
-
-Pairwise image registration:
-
-`python Test_C2FViT_pairwise.py --modelpath {model_path} --fixed {fixed_img_path} --moving {moving_img_path}`
-
-
-## Pre-trained model weights
-Pre-trained model weights can be downloaded with the links below:
-
-Unsupervised:
-- [C2FViT_affine_COM_pairwise_stagelvl3_118000.pth](https://drive.google.com/file/d/1CQvyx96YBor9D7TWvvqHs6fuiJl-Jfay/view?usp=sharing)
-- [C2FViT_affine_COM_template_matching_stagelvl3_116000.pth](https://drive.google.com/file/d/1uIItkfByyDYtxVxsjems_1HATRzcVCWX/view?usp=sharing)
-
-Semi-supervised:
-- [C2FViT_affine_COM_pairwise_semi_stagelvl3_95000.pth](https://drive.google.com/file/d/1T5JvXa3dCkFoFXNe5k7m3TDVn9AJv2_H/view?usp=sharing)
-- [C2FViT_affine_COM_template_matching_semi_stagelvl3_130000.pth](https://drive.google.com/file/d/1bfh_jVOK5Ip2bBuTpCPYlQGFCMWpG_cb/view?usp=sharing)
-
-## Train your own model
-Step 0 (optional): Download the preprocessed OASIS dataset from https://github.com/adalca/medical-datasets/blob/master/neurite-oasis.md and place it under the `Data` folder.
-
-Step 1: Replace `/PATH/TO/YOUR/DATA` with the path of your training data, e.g., `../Data/OASIS`, and make sure `imgs` and `labels` are properly loaded in the training script.
-
-Step 2: Run `python {training_script}`, see "Training and testing scripts" for more details.
-
-## Publication
-If you find this repository useful, please cite:
-- **Affine Medical Image Registration with Coarse-to-Fine Vision Transformer**  
-[Tony C. W. Mok](https://cwmok.github.io/ "Tony C. W. Mok"), Albert C. S. Chung  
-CVPR2022. [eprint arXiv:2203.15216](https://arxiv.org/abs/2203.15216)
-
-
-## Acknowledgment
-Some codes in this repository are modified from [PVT](https://github.com/whai362/PVT) and [ViT](https://github.com/lucidrains/vit-pytorch).
-The MNI152 brain template is provided by the [FLIRT (FMRIB's Linear Image Registration Tool)](https://fsl.fmrib.ox.ac.uk/fsl/fslwiki/FLIRT#Template_Images).
-
-###### Keywords
-Keywords: Affine registration, Coarse-to-Fine Vision Transformer, 3D Vision Transformer
