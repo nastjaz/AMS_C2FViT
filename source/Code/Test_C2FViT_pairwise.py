@@ -235,20 +235,17 @@ if __name__ == '__main__':
         deformation_ = np.transpose(deformation_temp, (1, 2, 3, 0))
         print(deformation_.shape)
 
-        # Pretvori numpy array v SimpleITK Image
-        deformation_sitk = sitk.GetImageFromArray(deformation_.transpose(1, 2, 3, 0))  # Transpose to match ITK's order (z, y, x, vector_size)
+        affine_matrix_4x4 = np.eye(4)  # Začetna 4x4 matrika
+        affine_matrix_4x4[:3, :] = affine_matrix  # Vnesite svojo 3x4 matriko
 
-        # Nastavi SimpleITK deformacijsko sliko
-        deformation_sitk.SetDirection(moving_header['srow_x'][:3])  # Usmerjenost slike
-        deformation_sitk.SetOrigin([moving_header['qoffset_x'], moving_header['qoffset_y'], moving_header['qoffset_z']])  # Izvor
-        deformation_sitk.SetSpacing(moving_header['pixdim'][1:4])  # Razmik med pikami
+        # Ustvarite NIfTI sliko iz deformacijskega polja
+        nifti_img = nib.Nifti1Image(deformation_, affine=affine_matrix_4x4)
 
-        # Shrani sliko
-        sitk.WriteImage(deformation_sitk, f"{savepath}/deformation_field_{moving_base}.nii.gz")
-
+        # Shrani NIfTI sliko
+        output_path = f"{savepath}/deformation_field_{moving_base}.nii.gz"
+        nib.save(nifti_img, output_path)
+        
         save_img(X_Y_cpu, f"{savepath}/warped_{moving_base}", header=header, affine=affine)
-        # Shrani v .nii.gz format
-        sitk.WriteImage(deformation_sitk, f"{savepath}/deformation_field_{moving_base}.nii.gz")
         #save_affine_transform(affine_matrix_cpu, f"{savepath}/transform_{moving_base}", header=header, affine=affine)
 
     print("Result saved to :", savepath)
