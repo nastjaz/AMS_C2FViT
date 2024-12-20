@@ -20,9 +20,12 @@ if __name__ == '__main__':
                         dest="modelpath",
                         default='../Model/C2FViT_affine_COM_pairwise_stagelvl3_118000.pth',
                         help="Pre-trained Model path")
-    parser.add_argument("--savepath", type=str,
-                        dest="savepath", default='../Result',
+    parser.add_argument("--savepath1", type=str,
+                        dest="savepath1", default='../Result',
                         help="path for saving images")
+    parser.add_argument("--savepath2", type=str,
+                        dest="savepath2", default='../DeformationField',
+                        help="path for saving deformation fields")
     parser.add_argument("--fixed", type=str,
                         dest="fixed", default='../Data/image_B.nii.gz',
                         help="fixed image")
@@ -34,12 +37,16 @@ if __name__ == '__main__':
                         help="True: Enable Center of Mass initialization, False: Disable")
     opt = parser.parse_args()
 
-    savepath = opt.savepath
+    savepath1 = opt.savepath1
+    savepath2 = opt.savepath2
     fixed_path = opt.fixed
     moving_path = opt.moving
     com_initial = opt.com_initial
-    if not os.path.isdir(savepath):
-        os.mkdir(savepath)
+    if not os.path.isdir(savepath1):
+        os.mkdir(savepath1)
+    if not os.path.isdir(savepath2):
+        os.mkdir(savepath2)
+
 
     # use_cuda = False
     # # use_cuda = True
@@ -253,10 +260,11 @@ if __name__ == '__main__':
         moving_base1 = moving_base.replace('.nii.gz', '').replace('ThoraxCBCT_', '')
         
         # Shrani NIfTI sliko
-        output_path = f"{savepath}/disp_{fixed_base1}_{moving_base1}.nii.gz"
+        output_path = f"{savepath2}/disp_{fixed_base1}_{moving_base1}.nii.gz"
         nib.save(nifti_img, output_path)
         
-        save_img(X_Y_cpu, f"{savepath}/warped_{fixed_base1}_{moving_base1}.nii.gz", header=header, affine=affine)
+        save_img(X_Y_cpu, f"{savepath1}/warped_{fixed_base1}_{moving_base1}.nii.gz", header=header, affine=affine)
         #save_affine_transform(affine_matrix_cpu, f"{savepath}/transform_{moving_base}", header=header, affine=affine)
 
-    print("Result saved to :", savepath)
+    print("Result saved to :", savepath1)
+    print("Deformation field saved to :", savepath2)
