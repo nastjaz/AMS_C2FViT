@@ -1,68 +1,56 @@
+import os
 import SimpleITK as sitk
 import numpy as np
-import matplotlib.pyplot as plt
 
-def resize_image(image, target_size=(256, 256, 256)):
-    # Pridobi trenutne dimenzije slike in spacing
-    original_size = np.array(image.GetSize())
-    original_spacing = np.array(image.GetSpacing())
+def add_padding_to_image(image, target_size=(256, 256, 256), padding_value=0):
+    # Pretvori sliko v NumPy array
+    image_array = sitk.GetArrayFromImage(image)
+    
+    # Prvotna velikost
+    original_size = image_array.shape  # Oblika v (z, y, x)
+    
+    # Izračun paddinga
+    padding = [(0, target_size[i] - original_size[i]) for i in range(3)]
+    
+    # Dodajanje paddinga
+    padded_array = np.pad(image_array, pad_width=padding, mode='constant', constant_values=padding_value)
 
-    # Izračun novega spacinga na podlagi tarčne velikosti
-    new_spacing = original_spacing * (original_size / np.array(target_size))
+    # Pretvorba nazaj v SimpleITK
+    final_image = sitk.GetImageFromArray(padded_array)
+    final_image.SetSpacing(image.GetSpacing())  # Ohranimo spacing
+    final_image.SetOrigin(image.GetOrigin())    # Ohranimo origin
+    final_image.SetDirection(image.GetDirection())  # Ohranimo direction
+    return final_image
 
-    # Resampling filter
-    resample = sitk.ResampleImageFilter()
-    resample.SetOutputSpacing(new_spacing.tolist())
-    resample.SetSize(target_size)
-    resample.SetInterpolator(sitk.sitkLinear)  # Linearna interpolacija
-    resample.SetOutputOrigin(image.GetOrigin())
-    resample.SetOutputDirection(image.GetDirection())
+# Pot do map
+input_dir = "/media/FastDataMama/nastjaz/AMS_C2FViT/source/OriginalData"
+output_dir = "/media/FastDataMama/nastjaz/AMS_C2FViT/source/Data"
 
-    # Resizaj sliko
-    return resample.Execute(image)
 
-# Pot do tvoje NIfTI datoteke
-input_filepath = "../Data/ThoraxCBCT_0000_0000.nii.gz"
+# Ustvari izhodno mapo, če ne obstaja
+if not os.path.exists(output_dir):
+    os.makedirs(output_dir)
 
-# Nalaganje slike
-data = sitk.ReadImage(input_filepath)
+# Ciljna velikost
+target_size = (256, 256, 256)
 
-# Preveri dimenzije
-print("Dimenzije slike:", data.GetSize())
+# Prehodi skozi vse datoteke v mapi
+for filename in os.listdir(input_dir):
+    if filename.endswith(".nii.gz"):
+        input_filepath = os.path.join(input_dir, filename)
+        output_filepath = os.path.join(output_dir, filename)
 
-# Resizanje na 256 × 256 × 256
-resized_data = resize_image(data, target_size=(256, 256, 256))
+        print(f"Procesiram datoteko: {filename}")
 
-# Preveri nove dimenzije
-print("Nove dimenzije slike:", resized_data.GetSize())
+        # Nalaganje slike
+        image = sitk.ReadImage(input_filepath)
 
-# Shrani resized sliko
-# sitk.WriteImage(resized_image, output_filepath)
+        # Dodajanje paddinga
+        padded_image = add_padding_to_image(image, target_size=target_size)
 
-# Pretvori slike v NumPy array
-data_array = sitk.GetArrayFromImage(data)
-resized_data_array = sitk.GetArrayFromImage(resized_data)
+        # Shranjevanje slike s paddingom
+        sitk.WriteImage(padded_image, output_filepath)
 
-# Izberi srednjo rezino (npr. srednja rezina v osi Y)
-slice_index = data_array.shape[1] // 2
+        print(f"Shranjeno: {output_filepath}")
 
-# Izreži koronalno rezino
-original_slice = data_array[:, slice_index, :]  # Dimenzije: (z, x)
-resized_slice = resized_data_array[:, slice_index, :]  # Dimenzije: (z, x)
-
-# Prikaz koronalnih rezin
-fig, ax = plt.subplots(1, 2, figsize=(10, 5))
-
-# Prikaz originalne slike
-ax[0].imshow(original_slice, cmap='gray', origin='lower')
-ax[0].set_title('Original Image')
-ax[0].axis('off')
-
-# Prikaz resized slike
-ax[1].imshow(resized_slice, cmap='gray', origin='lower')
-ax[1].set_title('Resized Image')
-ax[1].axis('off')
-
-# Pokaži vse slike
-plt.tight_layout()
-plt.show()
+print("Procesiranje končano.")
