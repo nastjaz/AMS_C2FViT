@@ -55,7 +55,7 @@ for filename in os.listdir(input_dir_images):
 
         else:
             # Shranjevanje slike s paddingom v mapo Data
-            output_filepath = os.path.join(output_dirImages, filename)
+            output_filepath = os.path.join(output_dir_images, filename)
             print(f"Procesiram in paddam sliko: {filename}")
             
             # Nalaganje slike

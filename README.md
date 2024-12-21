@@ -40,10 +40,6 @@ First command builds a Docker image named my-docker-image from a Dockerfile in t
 `docker build -t my-docker-image -f Dockerfile .`
 
 
-### Example
-`docker run --name new-container --runtime=nvidia -it --rm -v $(pwd):/workdir --workdir /workdir/source my-docker-image python3 Code/Test_C2FViT_pairwise.py --modelpath Model/CBCT_affineC2FViT_1000stagelvl3_0.pth --fixed Data/validation/ThoraxCBCT_0011_0001.nii.gz --moving Data/validation/ThoraxCBCT_0011_0000.nii.gz`
-
-
 ## Data Preparation
 
 The original images in our dataset have dimensions of 256x192x192. However, to train the model, the input images need to be resized to 256x256x256. This resizing is achieved through padding. Specifically, we use the `ImageResize.py` function, which adds padding to the images to ensure they reach the required dimensions of 256x256x256. The padded images are then saved in the `Data` directory, where they are ready for use in training the model.
