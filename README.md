@@ -49,7 +49,7 @@ The data preparation process begins with loading the original images (imagesTr) 
 ![plot](./source/Figure/structure.png?raw=true)
 
 
-**Important: Before running the script, make sure to change the path to your own data. The paths in the code below are placeholders and must be updated to point to the location of your dataset.**
+**Important: Before running the script, make sure to change the path to your own data. The paths in the code are placeholders and must be updated to point to the location of your dataset.**
 
 
 ## Train Command
