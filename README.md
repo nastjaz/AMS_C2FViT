@@ -46,20 +46,7 @@ The original images in our dataset have dimensions of 256x192x192. However, to t
 
 The data preparation process begins with loading the original images (imagesTr) and labels (labelsTr) into the `source/OriginalData` and `source/OriginalLabels` directories. After processing the images and labels through the ImageResize.py function (which resizes the images and adds padding where necessary), the directory structure of the data is organized as follows: 
 
-source/
-├── Data/
-│   ├── ThoraxCBCT_0000_*.nii.gz
-│   ├── ThoraxCBCT_0001_*.nii.gz
-│   ├── ...
-│   ├── ThoraxCBCT_0010_*.nii.gz
-│   ├── labels/
-│   |    ├── ThoraxCBCT_0011_*.nii.gz
-│   |    ├── ThoraxCBCT_0012_*.nii.gz
-│   |    └── ThoraxCBCT_0013_*.nii.gz
-│   └── validation/
-│       ├── ThoraxCBCT_0011_*.nii.gz
-│       ├── ThoraxCBCT_0012_*.nii.gz
-│       └── ThoraxCBCT_0013_*.nii.gz
+![plot](./source/Figure/structure.png?raw=true)
 
 
 **Important: Before running the script, make sure to change the path to your own data. The paths in the code below are placeholders and must be updated to point to the location of your dataset.**
