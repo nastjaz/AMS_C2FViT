@@ -48,16 +48,36 @@ First command builds a Docker image named my-docker-image from a Dockerfile in t
 
 The original images in our dataset have dimensions of 256x192x192. However, to train the model, the input images need to be resized to 256x256x256. This resizing is achieved through padding. Specifically, we use the `ImageResize.py` function, which adds padding to the images to ensure they reach the required dimensions of 256x256x256. The padded images are then saved in the `Data` directory, where they are ready for use in training the model.
 
-The data preparation process begins with loading the original images (imagesTr) and labels (labelsTr) into the `source/OriginalData` and `source/OriginalLabels` directories. The images are then processed using the `ImageResize.py` function located in the `Code` directory(the same padding process is applied for both images and labels; it is only necessary to comment and uncomment the respective code for images or labels). This function resizes and adds padding to the images and labels, ensuring they conform to the desired dimensions. The processed images are saved in the `Data` and `Labels` directory, which is later used for training the model.
+The data preparation process begins with loading the original images (imagesTr) and labels (labelsTr) into the `source/OriginalData` and `source/OriginalLabels` directories. After processing the images and labels through the ImageResize.py function (which resizes the images and adds padding where necessary), the directory structure of the data is organized as follows: 
 
-It is important to note that resizing the data is only required for training with the `Train_C2FViT.py` function.
+source/
+├── Data/
+│   ├── ThoraxCBCT_0000_*.nii.gz
+│   ├── ThoraxCBCT_0001_*.nii.gz
+│   ├── ...
+│   ├── ThoraxCBCT_0010_*.nii.gz
+│   ├── labels/
+│   |    ├── ThoraxCBCT_0011_*.nii.gz
+│   |    ├── ThoraxCBCT_0012_*.nii.gz
+│   |    └── ThoraxCBCT_0013_*.nii.gz
+│   └── validation/
+│       ├── ThoraxCBCT_0011_*.nii.gz
+│       ├── ThoraxCBCT_0012_*.nii.gz
+│       └── ThoraxCBCT_0013_*.nii.gz
 
 
 ## Train Command
 
 `docker run --name {name of a container} --runtime=nvidia -it --rm -v $(pwd):/workdir --workdir {workdir} --shm-size=8g my-docker-image python3 Train_C2FViT_pairwise.py --modelname {model_name} --lr 1e-4 --iteration 1000 --checkpoint 1000 --datapath {data_path} --com_initial True`
 
+Once the training starts, files will be saved in two main directories within the `AMS_C2FViT` folder:
+- `Log/`: This directory will contain logs from the training process. It helps to monitor the training progress and performance.
+- `Model/`: This directory stores the trained model's weights and checkpoint files. 
+
+After the training is complete, you need to copy the weights from the `Model/` directory to the `source/Model/` directory in your project structure for further use.
+
 ### Example
+
 `docker run --name new-container --runtime=nvidia -it --rm -v $(pwd):/workdir --workdir /workdir/source --shm-size=8g my-docker-image python3 Code/Train_C2FViT_pairwise.py --modelname CBCT_affineC2FViT_10000 --lr 1e-4 --iteration 1000 --checkpoint 1000 --datapath Data --com_initial True`
 
 
@@ -65,6 +85,16 @@ It is important to note that resizing the data is only required for training wit
 
 `docker run --name {name of a container} --runtime=nvidia -it --rm -v $(pwd):/workdir --workdir {workdir} python3 Test_C2FViT_pairwise.py --modelpath {model_path} --fixed {fixed_img_path} --moving {moving_img_path}`
 
+After running the test command, the output will be saved in two directories within the `AMS_C2FViT` folder:
+
+- **Warped Image:** The warped (registered) image will be saved in the result folder.
+- **Deformation Field:** The deformation field will be saved in the DeformationField folder.
+
 ### Example
 
-docker run --name new-container --runtime=nvidia -it --rm -v $(pwd):/workdir --workdir /workdir/source my-docker-image python3 Code/Test_C2FViT_pairwise.py --modelpath Model/CBCT_affineC2FViT_1000stagelvl3_0.pth --fixed OriginalData/validation/ThoraxCBCT_0011_0001.nii.gz --moving OriginalData/validation/ThoraxCBCT_0011_0000.nii.gz
+`docker run --name new-container --runtime=nvidia -it --rm -v $(pwd):/workdir --workdir /workdir/source my-docker-image python3 Code/Test_C2FViT_pairwise.py --modelpath Model/CBCT_affineC2FViT_1000stagelvl3_0.pth --fixed OriginalData/validation/ThoraxCBCT_0011_0001.nii.gz --moving OriginalData/validation/ThoraxCBCT_0011_0000.nii.gz`
+
+
+## Evaluation
+
+`docker run --rm -u $UID:$UID -v /media/FastDataMama/nastjaz/AMS_C2FViT/DeformationField:/input -v ./output:/output/ gitlab.lst.fe.uni-lj.si:5050/domenp/deformable-registration python evaluation.py -v`
