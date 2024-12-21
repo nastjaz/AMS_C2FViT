@@ -17,14 +17,7 @@ def load_4D(name):
     img_nii = nib.load(name)
     X = X.get_fdata()
     X = np.reshape(X, (1,) + X.shape)
-
-    # Pridobi header in affine matriko
-    header = img_nii.header
-    affine = img_nii.affine
-    #print(header)
-    #print(affine)
-
-    return X, header, affine
+    return X
 
 
 def load_4D_channel(name):
@@ -74,12 +67,17 @@ class Dataset_epoch(Data.Dataset):
         self.index_pair_label = list(itertools.permutations(labels, 2))
         self.use_label = use_label
 
+        print(f"Length of self.index_pair_label: {len(self.index_pair_label)}")
+
     def __len__(self):
         'Denotes the total number of samples'
         return len(self.index_pair)
+        
+
 
     def __getitem__(self, step):
         'Generates one sample of data'
+
         # Select sample
         img_A = load_4D(self.index_pair[step][0])
         img_B = load_4D(self.index_pair[step][1])
