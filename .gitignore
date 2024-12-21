@@ -14,6 +14,10 @@ __pycache__/
 # Ignoriraj slike
 *.nii.gz
 *.csv
+!AMS_C2FViT/Result/
+!AMS_C2FViT/DeformationField/
+!AMS_C2FViT/Result/*.nii.gz
+!AMS_C2FViT/DeformationField/*.nii.gz
 
 # Ignoriraj datoteke v formatu .txt in .npy (če so to datoteke, ki se ustvarijo med učenjem)
 *.txt
