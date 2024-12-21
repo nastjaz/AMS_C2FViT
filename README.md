@@ -77,7 +77,7 @@ After the training is complete, you need to copy the weights from the `Model/` d
 
 ### Example
 
-`docker run --name new-container --runtime=nvidia -it --rm -v $(pwd):/workdir --workdir /workdir/source --shm-size=8g my-docker-image python3 Code/Train_C2FViT_pairwise.py --modelname CBCT_affineC2FViT_800 --lr 1e-4 --iteration 800 --checkpoint 100 --datapath Data --com_initial True`
+`docker run --name new-container --runtime=nvidia -it --rm -v $(pwd):/workdir --workdir /workdir/source --shm-size=8g my-docker-image python3 Code/Train_C2FViT_pairwise.py --modelname CBCT_affineC2FViT_1000 --lr 1e-4 --iteration 1000 --checkpoint 100 --datapath Data --com_initial True`
 
 
 ## Test Command
