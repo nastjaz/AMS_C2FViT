@@ -80,8 +80,8 @@ if __name__ == '__main__':
         fixed_img = np.clip(fixed_img, a_min=2500, a_max=np.max(fixed_img))
 
     moving_img, moving_header, moving_affine = load_4D(moving_path)
-    print(moving_img.shape)
-    print(fixed_img.shape)
+    # print(moving_img.shape)
+    # print(fixed_img.shape)
 
     fixed_img = min_max_norm(fixed_img)
     moving_img = min_max_norm(moving_img)
@@ -102,14 +102,14 @@ if __name__ == '__main__':
         if len(target_size) > len(original_size):
             padding += [(0, 0)] * (len(target_size) - len(original_size))
         
-        print(f"Original size: {original_size}")
-        print(f"Target size: {target_size}")
-        print(f"Padding to add: {padding}")
+        # print(f"Original size: {original_size}")
+        # print(f"Target size: {target_size}")
+        # print(f"Padding to add: {padding}")
 
         # Dodajanje paddinga
         padded_array = np.pad(image_array, pad_width=padding, mode='constant', constant_values=padding_value)
 
-        print(f"Padded image shape: {padded_array.shape}")
+        # print(f"Padded image shape: {padded_array.shape}")
         return padded_array
 
     target_size = (1, 256, 256, 256)
@@ -139,9 +139,9 @@ if __name__ == '__main__':
             :target_size[2],  # z-dimenzija
         ]
 
-        print(f"Padded size: {padded_size}")
-        print(f"Cropping indices: {crop_indices}")
-        print(f"Cropped image size: {cropped_array.shape}")
+        # print(f"Padded size: {padded_size}")
+        # print(f"Cropping indices: {crop_indices}")
+        # print(f"Cropped image size: {cropped_array.shape}")
         return cropped_array
 
         
@@ -169,9 +169,9 @@ if __name__ == '__main__':
         ]
 
 
-        print(f"Padded size: {padded_size}")
-        print(f"Cropping indices: {crop_indices}")
-        print(f"Cropped image size: {cropped_array.shape}")
+        # print(f"Padded size: {padded_size}")
+        # print(f"Cropping indices: {crop_indices}")
+        # print(f"Cropped image size: {cropped_array.shape}")
         return cropped_array
    
 
@@ -196,7 +196,7 @@ if __name__ == '__main__':
 
         X_Y_cpu = X_Y.data.cpu().numpy()[0, 0, :, :, :]
         image_shape = X_Y.data.cpu().numpy()[0, 0, :, :, :].shape
-        print(f"Velikost slike wraped:{image_shape}")
+        # print(f"Velikost slike wraped:{image_shape}")
         
 
         affine_matrix = affine_matrix.cpu().numpy()
@@ -230,7 +230,7 @@ if __name__ == '__main__':
         y_prime = transformed_points[1, :].reshape(image_shape)
         z_prime = transformed_points[2, :].reshape(image_shape)
         # Izpis informacij
-        print("Oblika transformiranih koordinat:", x_prime.shape, y_prime.shape, z_prime.shape)
+        #print("Oblika transformiranih koordinat:", x_prime.shape, y_prime.shape, z_prime.shape)
         
         # Izračunaj deformacijsko polje (difference med x', y', z' in originalnimi koordinatami)
         def_field_x = x_prime - x_grid
@@ -246,14 +246,14 @@ if __name__ == '__main__':
         target_size3 = (3, 256, 192, 192)
         deformation_temp = crop_deformation_field(deformation_field, target_size=target_size3)
         deformation_ = np.transpose(deformation_temp, (1, 2, 3, 0))
-        print(deformation_.shape)
+        # print(deformation_.shape)
 
         affine_matrix_4x4 = np.eye(4)  # Začetna 4x4 matrika
         affine_matrix_4x4[:3, :] = affine_matrix  # Vnesite svojo 3x4 matriko
 
         # Ustvarite NIfTI sliko iz deformacijskega polja
         nifti_img = nib.Nifti1Image(deformation_, affine=affine_matrix_4x4)
-        print(f"Oblika podatkov v NIfTI sliki: {nifti_img.shape}")
+        # print(f"Oblika podatkov v NIfTI sliki: {nifti_img.shape}")
 
         # Odstranite končnico '.nii.gz' iz obeh
         fixed_base1 = fixed_base.replace('.nii.gz', '').replace('ThoraxCBCT_', '')
