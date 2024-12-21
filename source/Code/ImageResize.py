@@ -25,14 +25,15 @@ def add_padding_to_image(image, target_size=(256, 256, 256), padding_value=0):
 # Pot do map slik
 input_dir = "/media/FastDataMama/nastjaz/AMS_C2FViT/source/OriginalData"
 output_dir = "/media/FastDataMama/nastjaz/AMS_C2FViT/source/Data"
+validation_dir = os.path.join(output_dir, "validation")
 
 # Pot do map labels
 # input_dir = "/media/FastDataMama/nastjaz/AMS_C2FViT/source/OriginalLabels"
 # output_dir = "/media/FastDataMama/nastjaz/AMS_C2FViT/source/Data/labels"
 
-# Ustvari izhodno mapo, če ne obstaja
-if not os.path.exists(output_dir):
-    os.makedirs(output_dir)
+# Ustvari izhodni mapi, če ne obstajata
+os.makedirs(output_dir, exist_ok=True)
+os.makedirs(validation_dir, exist_ok=True)
 
 # Ciljna velikost
 target_size = (256, 256, 256)
@@ -41,19 +42,28 @@ target_size = (256, 256, 256)
 for filename in os.listdir(input_dir):
     if filename.endswith(".nii.gz"):
         input_filepath = os.path.join(input_dir, filename)
-        output_filepath = os.path.join(output_dir, filename)
+        
+        # Preveri, ali datoteka sodi v "validation" ali ne
+        if "0011" in filename or "0012" in filename or "0013" in filename:
+            output_filepath = os.path.join(validation_dir, filename)
+            print(f"Kopiram originalno sliko v validation: {filename}")
 
-        print(f"Procesiram datoteko: {filename}")
+            # Nalaganje in shranjevanje originalne slike
+            image = sitk.ReadImage(input_filepath)
+            sitk.WriteImage(image, output_filepath)
 
-        # Nalaganje slike
-        image = sitk.ReadImage(input_filepath)
-
-        # Dodajanje paddinga
-        padded_image = add_padding_to_image(image, target_size=target_size)
-
-        # Shranjevanje slike s paddingom
-        sitk.WriteImage(padded_image, output_filepath)
-
-        print(f"Shranjeno: {output_filepath}")
+        else:
+            # Shranjevanje slike s paddingom v mapo Data
+            output_filepath = os.path.join(output_dir, filename)
+            print(f"Procesiram in paddam sliko: {filename}")
+            
+            # Nalaganje slike
+            image = sitk.ReadImage(input_filepath)
+            
+            # Dodajanje paddinga
+            padded_image = add_padding_to_image(image, target_size=target_size)
+            
+            # Shranjevanje slike s paddingom
+            sitk.WriteImage(padded_image, output_filepath)
 
 print("Procesiranje končano.")
