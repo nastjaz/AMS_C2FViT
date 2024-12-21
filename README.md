@@ -91,9 +91,4 @@ After running the test command, the output will be saved in two directories with
 
 ### Example
 
-`docker run --name new-container --runtime=nvidia -it --rm -v $(pwd):/workdir --workdir /workdir/source my-docker-image python3 Code/Test_C2FViT_pairwise.py --modelpath Model/CBCT_affineC2FViT_1000stagelvl3_0.pth --fixed OriginalData/validation/ThoraxCBCT_0011_0001.nii.gz --moving OriginalData/validation/ThoraxCBCT_0011_0000.nii.gz`
-
-
-## Evaluation
-
-`docker run --rm -u $UID:$UID -v /media/FastDataMama/nastjaz/AMS_C2FViT/DeformationField:/input -v ./output:/output/ gitlab.lst.fe.uni-lj.si:5050/domenp/deformable-registration python evaluation.py -v`
+`docker run --name new-container --runtime=nvidia -it --rm -v $(pwd):/workdir --workdir /workdir/source my-docker-image python3 Code/Test_C2FViT_pairwise.py --modelpath Model/CBCT_affineC2FViT_1000stagelvl3_0.pth --fixed OriginalData/ThoraxCBCT_0011_0001.nii.gz --moving OriginalData/ThoraxCBCT_0011_0000.nii.gz`

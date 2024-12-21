@@ -79,7 +79,7 @@ if __name__ == '__main__':
     if fixed_base == "MNI152_T1_1mm_brain_pad_RSP.nii.gz":
         fixed_img = np.clip(fixed_img, a_min=2500, a_max=np.max(fixed_img))
 
-    moving_img, moving_header, moving_affine = load_4D(moving_path)
+    moving_img = load_4D(moving_path)
     # print(moving_img.shape)
     # print(fixed_img.shape)
 
