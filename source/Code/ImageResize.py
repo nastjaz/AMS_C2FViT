@@ -2,6 +2,24 @@ import os
 import SimpleITK as sitk
 import numpy as np
 
+# Funkcija za Min-Max normalizacijo
+def min_max_norm(image):
+    # Pretvori sliko v NumPy array
+    img_array = sitk.GetArrayFromImage(image)
+    
+    # Normalizacija na interval [0, 1]
+    img_min = np.min(img_array)
+    img_max = np.max(img_array)
+    img_array = (img_array - img_min) / (img_max - img_min)
+    
+    # Pretvorba nazaj v SimpleITK
+    normalized_img = sitk.GetImageFromArray(img_array)
+    normalized_img.SetSpacing(image.GetSpacing())  # Ohranimo spacing
+    normalized_img.SetOrigin(image.GetOrigin())    # Ohranimo origin
+    normalized_img.SetDirection(image.GetDirection())  # Ohranimo direction
+    
+    return normalized_img
+
 def add_padding_to_image(image, target_size=(256, 256, 256), padding_value=0):
     # Pretvori sliko v NumPy array
     image_array = sitk.GetArrayFromImage(image)
@@ -51,7 +69,8 @@ for filename in os.listdir(input_dir_images):
 
             # Nalaganje in shranjevanje originalne slike
             image = sitk.ReadImage(input_filepath)
-            sitk.WriteImage(image, output_filepath)
+            normalized_image = min_max_norm(image)
+            sitk.WriteImage(normalized_image, output_filepath)
 
         else:
             # Shranjevanje slike s paddingom v mapo Data
@@ -64,8 +83,11 @@ for filename in os.listdir(input_dir_images):
             # Dodajanje paddinga
             padded_image = add_padding_to_image(image, target_size=target_size)
             
+            # Normalizacija slike
+            normalized_padded_image = min_max_norm(padded_image)
+
             # Shranjevanje slike s paddingom
-            sitk.WriteImage(padded_image, output_filepath)
+            sitk.WriteImage(normalized_padded_image, output_filepath)
 
 # Procesiranje label
 for filename in os.listdir(input_dir_labels):
@@ -76,7 +98,9 @@ for filename in os.listdir(input_dir_labels):
         print(f"Procesiram in paddam label: {filename}")
         label = sitk.ReadImage(input_filepath)
         padded_label = add_padding_to_image(label, target_size=target_size)
-        sitk.WriteImage(padded_label, output_filepath)
+        # Normalizacija label
+        normalized_padded_label = min_max_norm(padded_label)
+        sitk.WriteImage(normalized_padded_label, output_filepath)
 
 
 print("Procesiranje slik in label je končano.")

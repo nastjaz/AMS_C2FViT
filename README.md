@@ -42,7 +42,7 @@ First command builds a Docker image named my-docker-image from a Dockerfile in t
 
 ## Data Preparation
 
-The original images in our dataset have dimensions of 256x192x192. However, to train the model, the input images need to be resized to 256x256x256. This resizing is achieved through padding. Specifically, we use the `ImageResize.py` function, which adds padding to the images to ensure they reach the required dimensions of 256x256x256. The padded images are then saved in the `Data` directory, where they are ready for use in training the model.
+The original images in our dataset have dimensions of 256x192x192. However, to train the model, the input images need to be resized to 256x256x256. This resizing is achieved through padding. Specifically, we use the `ImageResize.py` function, which adds padding to the images to ensure they reach the required dimensions of 256x256x256. The padded images are then saved in the `Data` directory, where they are ready for use in training the model. In addition to resizing, we also normalize the image values using Min-Max normalization to scale the pixel intensities between 0 and 1.
 
 The data preparation process begins with loading the original images (imagesTr) and labels (labelsTr) into the `source/OriginalData` and `source/OriginalLabels` directories. After processing the images and labels through the ImageResize.py function (which resizes the images and adds padding where necessary), the directory structure of the data is organized as follows: 
 
@@ -60,6 +60,8 @@ source/
 │       ├── ThoraxCBCT_0011_*.nii.gz
 │       ├── ThoraxCBCT_0012_*.nii.gz
 │       └── ThoraxCBCT_0013_*.nii.gz
+
+**Important: Before running the script, make sure to change the path to your own data. The paths in the code below are placeholders and must be updated to point to the location of your dataset.**
 
 
 ## Train Command

@@ -12,7 +12,6 @@ from C2FViT_model import C2F_ViT_stage, AffineCOMTransform, Center_of_mass_initi
 from Functions import Dataset_epoch
 from UseCuda import device
 
-
 def dice(im1, atlas):
     unique_class = np.unique(atlas)
     dice = 0
@@ -58,7 +57,6 @@ def train():
 
     imgs = sorted(glob.glob(datapath + "/ThoraxCBCT_*_*.nii.gz"))
     labels = sorted(glob.glob(datapath + "/labels/ThoraxCBCT_*_*.nii.gz"))
-
 
     optimizer = torch.optim.Adam(model.parameters(), lr=lr)
     # optimizer = torch.optim.SGD(model.parameters(), lr=lr, momentum=0.9)
