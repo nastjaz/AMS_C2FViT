@@ -89,7 +89,7 @@ After the training is complete, you need to copy the weights from the `Model/` d
 
 After running the test command, the output will be saved in two directories within the `AMS_C2FViT` folder:
 
-- **Warped Image:** The warped (registered) image will be saved in the result folder.
+- **Warped Image:** The warped (registered) image will be saved in the Result folder.
 - **Deformation Field:** The deformation field will be saved in the DeformationField folder.
 
 ### Example
