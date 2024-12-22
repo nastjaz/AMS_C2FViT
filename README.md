@@ -39,6 +39,22 @@ First command builds a Docker image named my-docker-image from a Dockerfile in t
 
 `docker build -t my-docker-image -f Dockerfile .`
 
+The Dockerfile sets up an environment for running PyTorch models with GPU support, based on the official PyTorch image with built-in CUDA and cuDNN support.
+
+It installs the following libraries:
+- `numpy` for numerical operations,
+- `nibabel` for working with medical images,
+- `timm` for PyTorch Image Models (version 0.5.4),
+- `scipy` for scientific computing,
+- `SimpleITK` for image processing.
+
+The working directory is set to `/workdir/source`, where the main code is executed.
+
+The following command is used to run a container based on the previously built Docker image.
+
+`docker run --name my-container --runtime=nvidia -it --rm     -v $(pwd):/workdir     my-docker-image`
+
+
 
 ## Data Preparation
 
@@ -79,3 +95,12 @@ After running the test command, the output will be saved in two directories with
 ### Example
 
 `docker run --name new-container --runtime=nvidia -it --rm -v $(pwd):/workdir --workdir /workdir/source my-docker-image python3 Code/Test_C2FViT_pairwise.py --modelpath Model/CBCT_affineC2FViT_1000stagelvl3_0.pth --fixed OriginalData/ThoraxCBCT_0011_0001.nii.gz --moving OriginalData/ThoraxCBCT_0011_0000.nii.gz`
+
+
+## Evaluation
+
+`docker run --rm -u $UID:$UID -v ./input:/input -v ./output:/output/ gitlab.lst.fe.uni-lj.si:5050/domenp/deformable-registration python evaluation.py -v`
+
+### Example
+
+`docker run --rm -u $UID:$UID -v /media/FastDataMama/nastjaz/AMS_C2FViT/DeformationField:/input -v ./output:/output/ gitlab.lst.fe.uni-lj.si:5050/domenp/deformable-registration python evaluation.py -v`
