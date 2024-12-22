@@ -50,11 +50,11 @@ It installs the following libraries:
 
 The working directory is set to `/workdir/source`, where the main code is executed.
 
-The following command is used to run a container based on the previously built Docker image.
+The following commands are used to run and stop the container based on the previously built Docker image.
 
 `docker run --name my-container --runtime=nvidia -it --rm     -v $(pwd):/workdir     my-docker-image`
 
-
+`exit`
 
 ## Data Preparation
 
